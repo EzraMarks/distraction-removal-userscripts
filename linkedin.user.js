@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        linkedin
-// @version     9
+// @version     10
 // @match       https://www.linkedin.com/*
 // @updateURL   https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/linkedin.user.js
 // @downloadURL https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/linkedin.user.js
@@ -9,6 +9,13 @@
 (function() {
 
   const CSS = `
+    /* TEMP: confirm script is loaded */
+    html::before {
+      content: "v10 loaded";
+      position: fixed; top: 0; left: 0; z-index: 99999;
+      background: red; color: white; font-size: 20px; padding: 4px 8px;
+    }
+
     /* Scale desktop layout to fit mobile screen */
     html { zoom: 0.45; }
 
