@@ -56,11 +56,19 @@
 
   // ── 2. CSS: hide nav items ────────────────────────────────────────────
   const CSS = `
-    /* Keep "Explore" — on mobile its magnifying-glass icon is how you
-       reach search. /explore/ is redirected to /explore/search/ instead. */
+    /* Keep "Explore" nav — its magnifying-glass icon is how you reach
+       search on mobile. The discovery grid on /explore/ itself is hidden
+       below in JS. */
     a:has(svg[aria-label="Reels"]),
     a:has(svg[aria-label="Notifications"]),
     a:has(svg[aria-label="New post"]) {
+      display: none !important;
+    }
+
+    /* On /explore/, hide the discovery grid. <main> has two children:
+       a <nav> with the search bar (keep) and a <div> wrapping the grid
+       (hide). */
+    body[data-tweak-explore="1"] main > div {
       display: none !important;
     }
   `;
@@ -100,20 +108,25 @@
   tick();
   new MutationObserver(tick).observe(document.documentElement, { childList: true, subtree: true });
 
-  // ── 4. Redirect away from pure-discovery pages ────────────────────────
-  // /explore/  — discovery grid (only kept content is the search bar at top)
-  // /explore/search/keyword/ — keyword content grid
-  // /reels/    — reels feed
-  //
-  // /explore/search/ (account search with "Followed by X + N more" hints)
-  // is the only discovery URL we want, so explore-* redirects land there.
+  // ── 4. Page-level handling ────────────────────────────────────────────
+  // /reels/                       — redirect home
+  // /explore/search/keyword/?q=X  — keyword content grid → /explore/
+  //                                 (user re-taps search to do account search)
+  // /explore/                     — kept; grid hidden via the CSS rule above
+  //                                 (toggled by the body data attribute)
   function enforce() {
     var p = location.pathname;
     if (/^\/reels(\/|$)/.test(p)) {
       location.replace('https://www.instagram.com/');
-    } else if (p === '/explore/' || /^\/explore\/search\/keyword(\/|$)/.test(p)) {
-      location.replace('https://www.instagram.com/explore/search/');
+      return;
     }
+    if (/^\/explore\/search\/keyword(\/|$)/.test(p)) {
+      location.replace('https://www.instagram.com/explore/');
+      return;
+    }
+    document.body?.toggleAttribute && document.body.setAttribute(
+      'data-tweak-explore', p === '/explore/' ? '1' : '0'
+    );
   }
   enforce();
   const _push = history.pushState;
