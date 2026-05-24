@@ -2,7 +2,7 @@
 
 User scripts for [Hermit](https://hermit.chimbori.com/) on Android. The goal is to use these apps for what they're actually useful for — messaging, search, looking people up — without the feed, ads, and recommended content.
 
-Currently: LinkedIn.
+Currently: LinkedIn, Instagram.
 
 ## Setup
 
