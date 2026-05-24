@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     linkedin
-// @version  5
+// @version  6
 // ==/UserScript==
 (function() {
 
@@ -24,6 +24,11 @@
 
     /* Ads */
     [data-ad-banner] {
+      display: none !important;
+    }
+
+    /* Search results: hide premium upsell card */
+    [data-testid="lazy-column"] > [data-display-contents] {
       display: none !important;
     }
   `;
@@ -51,7 +56,13 @@
   const HOME = 'https://www.linkedin.com/messaging/';
 
   function enforce() {
-    if (!ALLOWED.some(r => r.test(location.pathname))) location.replace(HOME);
+    var p = location.pathname;
+    // Redirect /search/results/all to people — no stable CSS selector to hide just the Posts section
+    if (p.startsWith('/search/results/all')) {
+      location.replace(location.href.replace('/search/results/all', '/search/results/people'));
+      return;
+    }
+    if (!ALLOWED.some(r => r.test(p))) location.replace(HOME);
   }
 
   enforce();
