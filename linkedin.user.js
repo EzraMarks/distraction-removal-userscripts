@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        linkedin
-// @version     11
+// @version     12
 // @match       https://www.linkedin.com/*
 // @updateURL   https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/linkedin.user.js
 // @downloadURL https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/linkedin.user.js
@@ -17,9 +17,6 @@
   });
 
   const CSS = `
-    /* Scale desktop layout to fit mobile screen */
-    html { zoom: 0.45; }
-
     /* Nav: hide everything except Search and Messaging.
        Use path fragment without trailing slash — profile pages use absolute URLs
        (e.g. https://www.linkedin.com/mynetwork) while messaging uses relative (/mynetwork/). */
