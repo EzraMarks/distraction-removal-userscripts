@@ -1,4 +1,0 @@
-[[headers]]
-  for = "/*.user.js"
-  [headers.values]
-    Cache-Control = "no-store"

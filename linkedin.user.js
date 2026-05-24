@@ -1,19 +1,12 @@
 // ==UserScript==
-// @name        linkedin
-// @version     16
-// @match       https://www.linkedin.com/*
-// @updateURL   https://www.ezramarks.com/personal-app-tweaks/linkedin.user.js
-// @downloadURL https://www.ezramarks.com/personal-app-tweaks/linkedin.user.js
-// @run-at      document-start
+// @name     linkedin
+// @version  17
 // ==/UserScript==
 (function() {
 
   const CSS = `
-    html { zoom: 2.0; }
-
     /* Nav: hide everything except Search and Messaging.
-       Use path fragment without trailing slash — profile pages use absolute URLs
-       (e.g. https://www.linkedin.com/mynetwork) while messaging uses relative (/mynetwork/). */
+       Path fragment without trailing slash — profile pages use absolute URLs. */
     a[href*="/feed"],
     a[href*="/mynetwork"],
     a[href*="/jobs"],
@@ -22,7 +15,7 @@
       display: none !important;
     }
 
-    /* Feed page: hide content. These selectors are feed-specific (verified absent on search). */
+    /* Feed page: hide content (feed-specific, verified absent on search/profiles). */
     [data-testid="mainFeed"],
     [aria-label*="start a post" i] {
       display: none !important;
@@ -32,7 +25,6 @@
     [data-ad-banner] {
       display: none !important;
     }
-
   `;
 
   const style = document.createElement('style');
@@ -46,7 +38,7 @@
     }
   });
 
-  // Redirect away from disallowed pages — makes feed/network/jobs unreachable
+  // Redirect away from disallowed pages
   const ALLOWED = [
     /^\/messaging(\/|$)/,
     /^\/search\//,
@@ -59,7 +51,7 @@
 
   function enforce() {
     var p = location.pathname;
-    // Redirect /search/results/all to people — no stable CSS selector to hide just the Posts section
+    // Redirect /search/results/all to people — no stable CSS selector to hide just Posts
     if (p.startsWith('/search/results/all')) {
       location.replace(location.href.replace('/search/results/all', '/search/results/people'));
       return;
