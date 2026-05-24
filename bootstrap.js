@@ -1,34 +1,38 @@
-// Paste this once into each Hermit Lite App's user script slot.
-// It auto-loads the right CSS + JS for whichever site you're on from this repo.
-// Edit the .css / .js files in the repo to change behavior; reload the page in Hermit to see updates.
+// Paste this once into each Hermit Lite App's user script slot. Never edit again.
+// It derives the site name from the hostname and loads the matching CSS + JS
+// from this repo. To add a new site, just add `<name>.css` and/or `<name>.js`
+// to the repo — no bootstrap change needed.
+//
+// Mapping rule: strip leading www./m., then take the second-level domain.
+//   www.linkedin.com   -> linkedin
+//   m.instagram.com    -> instagram
+//   news.ycombinator.com -> ycombinator
 
 (async () => {
-  const SITES = {
-    'linkedin.com': 'linkedin',
-    'instagram.com': 'instagram',
-  };
-
-  const host = location.hostname.replace(/^(www|m)\./, '');
-  const key = Object.keys(SITES).find(d => host === d || host.endsWith('.' + d));
-  if (!key) return;
-  const name = SITES[key];
+  const host = location.hostname.replace(/^(www|m|mobile)\./, '');
+  const parts = host.split('.');
+  if (parts.length < 2) return;
+  const name = parts[parts.length - 2];
 
   const BASE = `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/${name}`;
   const bust = '?v=' + Date.now();
 
-  try {
-    const [css, js] = await Promise.all([
-      fetch(BASE + '.css' + bust).then(r => r.ok ? r.text() : ''),
-      fetch(BASE + '.js' + bust).then(r => r.ok ? r.text() : ''),
-    ]);
-    if (css) {
-      const style = document.createElement('style');
-      style.dataset.source = 'personal-app-tweaks';
-      style.textContent = css;
-      document.documentElement.appendChild(style);
-    }
-    if (js) new Function(js)();
-  } catch (e) {
-    console.error('[personal-app-tweaks] failed to load', e);
+  const fetchText = (url) =>
+    fetch(url).then(r => (r.ok ? r.text() : '')).catch(() => '');
+
+  const [css, js] = await Promise.all([
+    fetchText(BASE + '.css' + bust),
+    fetchText(BASE + '.js' + bust),
+  ]);
+
+  if (css) {
+    const style = document.createElement('style');
+    style.dataset.source = 'personal-app-tweaks';
+    style.textContent = css;
+    document.documentElement.appendChild(style);
+  }
+  if (js) {
+    try { new Function(js)(); }
+    catch (e) { console.error('[personal-app-tweaks] js error', e); }
   }
 })();

@@ -6,9 +6,10 @@ Small CSS + JS customizations I apply to social/professional apps running inside
 ## How it works
 
 Each Hermit Lite App runs a tiny `bootstrap.js` (set once, in Hermit's user-script
-slot). The bootstrap fetches the matching `<site>.css` and `<site>.js` from this
-repo every page load. Edit the files here, swipe to reload in Hermit, changes
-are live.
+slot — **never edited again**). It derives the site name from the hostname
+(`www.linkedin.com` → `linkedin`) and fetches the matching `<name>.css` and
+`<name>.js` from this repo every page load. To support a new site, just add the
+files — no bootstrap change.
 
 ```
 bootstrap.js          ← paste into each Hermit Lite App's user-script slot
