@@ -56,7 +56,8 @@
 
   // ── 2. CSS: hide nav items ────────────────────────────────────────────
   const CSS = `
-    a:has(svg[aria-label="Explore"]),
+    /* Keep "Explore" — on mobile its magnifying-glass icon is how you
+       reach search. /explore/ is redirected to /explore/search/ instead. */
     a:has(svg[aria-label="Reels"]),
     a:has(svg[aria-label="Notifications"]),
     a:has(svg[aria-label="New post"]) {
