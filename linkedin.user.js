@@ -1,47 +1,30 @@
 // ==UserScript==
 // @name     linkedin
-// @version  1.0
+// @version  2
 // ==/UserScript==
 (function() {
 
-  // Bump VERSION every commit so the alert proves the latest code is loaded.
-  const VERSION = 'v1';
-  alert(VERSION + ': linkedin script ran');
-
-  // -------- CSS (inlined, no external fetch — LinkedIn CSP blocks that) ----
   const CSS = `
-    /* DEBUG MARKER — remove once stable. */
-    html, body { background: hotpink !important; }
-    html::before {
-      content: "TWEAKS LOADED ✓";
-      position: fixed; top: 0; left: 0; right: 0;
-      z-index: 2147483647;
-      background: black; color: lime;
-      font: bold 18px monospace;
-      padding: 12px; text-align: center;
-    }
-
-    /* Hide global nav / bottom tab bar. */
-    nav[aria-label*="Primary" i],
-    [data-test-global-nav],
-    [class*="global-nav__primary"],
-    footer[role="navigation"] {
+    /* Nav: hide everything except Search and Messaging */
+    a[href*="/feed/"],
+    a[href*="/mynetwork/"],
+    a[href*="/jobs/"],
+    a[href*="/notifications/"],
+    a[href*="/learning/"] {
       display: none !important;
     }
 
-    /* Hide "Start a post" entrypoints. */
-    [aria-label*="start a post" i],
-    [aria-label*="create a post" i],
-    [data-control-name*="share"],
-    a[href*="/posts/new"],
-    button[aria-label*="post" i] {
+    /* Feed page: hide content (redirect below is primary, this is CSS fallback) */
+    section[aria-label="Primary content"],
+    [data-testid="mainFeed"],
+    aside[aria-label="Sidebar"],
+    aside[aria-label="Aside"],
+    [aria-label*="start a post" i] {
       display: none !important;
     }
 
-    /* Hide feed modules. */
-    [data-test-id*="feed" i],
-    [class*="feed-shared"],
-    [class*="news-feed"] {
+    /* Ads */
+    [data-ad-banner] {
       display: none !important;
     }
   `;
@@ -50,7 +33,7 @@
   style.textContent = CSS;
   (document.head || document.documentElement).appendChild(style);
 
-  // -------- JS: allowlist redirect ----------------------------------------
+  // Redirect away from disallowed pages — makes feed/network/jobs unreachable
   const ALLOWED = [
     /^\/messaging(\/|$)/,
     /^\/search\//,
@@ -62,12 +45,7 @@
   const HOME = 'https://www.linkedin.com/messaging/';
 
   function enforce() {
-    var p = location.pathname;
-    var ok = false;
-    for (var i = 0; i < ALLOWED.length; i++) {
-      if (ALLOWED[i].test(p)) { ok = true; break; }
-    }
-    if (!ok) location.replace(HOME);
+    if (!ALLOWED.some(r => r.test(location.pathname))) location.replace(HOME);
   }
 
   enforce();
