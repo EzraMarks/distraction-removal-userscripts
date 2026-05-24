@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     linkedin
-// @version  2
+// @version  3
 // ==/UserScript==
 (function() {
 
@@ -32,6 +32,13 @@
   const style = document.createElement('style');
   style.textContent = CSS;
   (document.head || document.documentElement).appendChild(style);
+
+  // "For Business" has no stable CSS selector — hide by text match
+  document.querySelectorAll('header button, header a').forEach(function(el) {
+    if (el.textContent.trim() === 'For Business') {
+      (el.closest('li') || el).style.setProperty('display', 'none', 'important');
+    }
+  });
 
   // Redirect away from disallowed pages — makes feed/network/jobs unreachable
   const ALLOWED = [
