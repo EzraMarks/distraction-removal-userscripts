@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        linkedin
-// @version     8
+// @version     9
 // @match       https://www.linkedin.com/*
 // @updateURL   https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/linkedin.user.js
 // @downloadURL https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/linkedin.user.js
@@ -8,13 +8,10 @@
 // ==/UserScript==
 (function() {
 
-  // Scale desktop layout to fit mobile screen (mimics Hermit's viewport behavior)
-  var vp = document.querySelector('meta[name=viewport]') || document.createElement('meta');
-  vp.name = 'viewport';
-  vp.content = 'width=1024, initial-scale=0.45';
-  if (!vp.parentNode) (document.head || document.documentElement).appendChild(vp);
-
   const CSS = `
+    /* Scale desktop layout to fit mobile screen */
+    html { zoom: 0.45; }
+
     /* Nav: hide everything except Search and Messaging.
        Use path fragment without trailing slash — profile pages use absolute URLs
        (e.g. https://www.linkedin.com/mynetwork) while messaging uses relative (/mynetwork/). */
