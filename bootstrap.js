@@ -1,38 +1,24 @@
-// Paste this once into each Hermit Lite App's user script slot. Never edit again.
-// It derives the site name from the hostname and loads the matching CSS + JS
-// from this repo. To add a new site, just add `<name>.css` and/or `<name>.js`
-// to the repo — no bootstrap change needed.
-//
-// Mapping rule: strip leading www./m., then take the second-level domain.
-//   www.linkedin.com   -> linkedin
-//   m.instagram.com    -> instagram
-//   news.ycombinator.com -> ycombinator
+// TEMPORARY DEBUG VERSION — proves user scripts run at all.
+// Copy this entire file into Hermit's user-script slot, replacing whatever's there.
+// If user scripts work, you'll see: an alert popup, a hot-pink page, and a green banner.
+// Once confirmed, we'll restore the real bootstrap.
 
-(async () => {
-  const host = location.hostname.replace(/^(www|m|mobile)\./, '');
-  const parts = host.split('.');
-  if (parts.length < 2) return;
-  const name = parts[parts.length - 2];
+(() => {
+  document.documentElement.style.setProperty('background', 'hotpink', 'important');
 
-  const BASE = `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/${name}`;
-  const bust = '?v=' + Date.now();
+  const banner = document.createElement('div');
+  banner.textContent = '🟢 USER SCRIPT IS RUNNING 🟢';
+  banner.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 2147483647;
+    background: black; color: lime;
+    font: bold 24px monospace;
+    padding: 20px; text-align: center;
+    border-bottom: 4px solid lime;
+  `;
+  const attach = () => (document.body || document.documentElement).appendChild(banner);
+  if (document.body) attach();
+  else document.addEventListener('DOMContentLoaded', attach);
 
-  const fetchText = (url) =>
-    fetch(url).then(r => (r.ok ? r.text() : '')).catch(() => '');
-
-  const [css, js] = await Promise.all([
-    fetchText(BASE + '.css' + bust),
-    fetchText(BASE + '.js' + bust),
-  ]);
-
-  if (css) {
-    const style = document.createElement('style');
-    style.dataset.source = 'personal-app-tweaks';
-    style.textContent = css;
-    document.documentElement.appendChild(style);
-  }
-  if (js) {
-    try { new Function(js)(); }
-    catch (e) { console.error('[personal-app-tweaks] js error', e); }
-  }
+  alert('User script ran ✓');
 })();
