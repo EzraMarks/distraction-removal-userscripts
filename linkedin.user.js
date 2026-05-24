@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     linkedin
-// @version  6
+// @version  7
 // ==/UserScript==
 (function() {
 
@@ -27,10 +27,6 @@
       display: none !important;
     }
 
-    /* Search results: hide premium upsell card */
-    [data-testid="lazy-column"] > [data-display-contents] {
-      display: none !important;
-    }
   `;
 
   const style = document.createElement('style');
