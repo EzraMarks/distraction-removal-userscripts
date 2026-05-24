@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     linkedin
-// @version  3
+// @version  4
 // ==/UserScript==
 (function() {
 
@@ -14,11 +14,8 @@
       display: none !important;
     }
 
-    /* Feed page: hide content (redirect below is primary, this is CSS fallback) */
-    section[aria-label="Primary content"],
+    /* Feed page: hide content. These selectors are feed-specific (verified absent on search). */
     [data-testid="mainFeed"],
-    aside[aria-label="Sidebar"],
-    aside[aria-label="Aside"],
     [aria-label*="start a post" i] {
       display: none !important;
     }
