@@ -4,29 +4,24 @@
 // ==/UserScript==
 (function() {
 
-  // Version marker — bump this every commit so we can confirm the latest
-  // version is actually loaded in Hermit when iterating.
-  const VERSION = 'v2';
-
+  const VERSION = 'v3';
   alert(VERSION + ': script started, host=' + location.hostname);
 
-  const host = location.hostname.replace(/^(www|m|mobile)\./, '');
-  const parts = host.split('.');
-  const name = parts.length >= 2 ? parts[parts.length - 2] : '';
-  const BASE = 'https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/' + name;
-  const bust = '?v=' + Date.now();
+  const targets = [
+    ['github-raw', 'https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/linkedin.css'],
+    ['jsdelivr',   'https://cdn.jsdelivr.net/gh/EzraMarks/personal-app-tweaks@main/linkedin.css'],
+    ['same-origin', location.origin + '/favicon.ico'],
+  ];
 
-  fetch(BASE + '.css' + bust)
-    .then(function(r) { return r.ok ? r.text() : ''; })
-    .then(function(css) {
-      alert(VERSION + ': css fetch returned length=' + css.length);
-      if (css) {
-        var style = document.createElement('style');
-        style.textContent = css;
-        document.documentElement.appendChild(style);
-        alert(VERSION + ': css applied');
-      }
-    })
-    .catch(function(e) { alert(VERSION + ': css fetch ERROR: ' + e.message); });
+  targets.forEach(function(t) {
+    var label = t[0], url = t[1];
+    fetch(url + '?bust=' + Date.now())
+      .then(function(r) {
+        alert(VERSION + ': ' + label + ' OK status=' + r.status);
+      })
+      .catch(function(e) {
+        alert(VERSION + ': ' + label + ' FAIL: ' + e.message);
+      });
+  });
 
 })();
