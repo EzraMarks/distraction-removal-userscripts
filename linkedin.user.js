@@ -1,16 +1,18 @@
 // ==UserScript==
 // @name     linkedin
-// @version  4
+// @version  5
 // ==/UserScript==
 (function() {
 
   const CSS = `
-    /* Nav: hide everything except Search and Messaging */
-    a[href*="/feed/"],
-    a[href*="/mynetwork/"],
-    a[href*="/jobs/"],
-    a[href*="/notifications/"],
-    a[href*="/learning/"] {
+    /* Nav: hide everything except Search and Messaging.
+       Use path fragment without trailing slash — profile pages use absolute URLs
+       (e.g. https://www.linkedin.com/mynetwork) while messaging uses relative (/mynetwork/). */
+    a[href*="/feed"],
+    a[href*="/mynetwork"],
+    a[href*="/jobs"],
+    a[href*="/notifications"],
+    a[href*="/learning"] {
       display: none !important;
     }
 
