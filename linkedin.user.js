@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name        linkedin
-// @version     13
+// @version     14
 // @match       https://www.linkedin.com/*
-// @updateURL   https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/linkedin.user.js
-// @downloadURL https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/linkedin.user.js
+// @updateURL   https://cdn.jsdelivr.net/gh/EzraMarks/personal-app-tweaks@main/linkedin.user.js
+// @downloadURL https://cdn.jsdelivr.net/gh/EzraMarks/personal-app-tweaks@main/linkedin.user.js
 // @run-at      document-start
 // ==/UserScript==
 (function() {
