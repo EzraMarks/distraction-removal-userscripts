@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name     personal-app-tweaks bootstrap
+// @name     bootstrap
 // @version  1.0
 // ==/UserScript==
 
