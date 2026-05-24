@@ -1,28 +1,28 @@
 # For Claude
 
-## Purpose
+## What this is
 
-Strip algorithmic noise from social/professional apps — ads, suggested content, engagement nudges — while keeping the functional parts (messaging, search, profiles). Each script is opinionated: it decides what's useful and makes everything else unreachable or invisible.
+Scripts that make social/professional apps less invasive — ads, suggested content, and engagement nudges are hidden or made unreachable, while the actually useful parts (messaging, search, profiles) still work. Each script is opinionated about what's worth keeping.
 
 ## Workflow
 
 1. Edit `<site>.user.js` here.
-2. User pastes the file into Hermit's user-script slot, reloads.
-3. User reports what's still broken or distracting.
+2. The user pastes it into Hermit's user-script slot and reloads.
+3. The user reports what's still broken or distracting.
 
-**Before committing:** test selectors in Chrome DevTools MCP (logged into the target site as the user). Verify rules actually match — don't guess.
+Test selectors in Chrome DevTools MCP (logged into the target site) before committing. Verify rules actually match the elements they're supposed to.
 
 ## Architecture
 
-- One self-contained `.user.js` per site. Must end in `.user.js` (Hermit rejects others silently).
-- CSS + JS must be inlined. Hermit has no `@require`/`@grant`/`@updateURL`, and LinkedIn's CSP blocks cross-origin fetch.
-- Hermit Lite Apps use **desktop user agent** for LinkedIn. Test in desktop Chrome.
+- One self-contained `.user.js` per site. The filename must end in `.user.js` — Hermit silently ignores others.
+- CSS and JS must be inlined. Hermit has no `@require`/`@grant`/`@updateURL`, and LinkedIn's CSP blocks cross-origin fetch.
+- Hermit Lite Apps use a desktop user agent for LinkedIn. Test in desktop Chrome.
 
-## Conventions
+## Things learned the hard way
 
-- Bump `@version` every commit — user confirms the right version loaded after paste.
-- Add debug pink background + version alert while iterating; remove before final commit.
-- Selector priority: `href` patterns > `aria-label` > `data-testid` > structure. Never class names.
-- Profile pages use absolute `href` values; other pages use relative. Use path fragment without trailing slash to match both (e.g. `a[href*="/jobs"]` not `a[href*="/jobs/"]`).
-- The JS allowlist-redirect is load-bearing — CSS is just a fallback.
-- When a CSS selector also matches pages it shouldn't (search, profiles), scope it or drop it and handle in JS instead.
+- Bump `@version` on every commit. The user confirms the right version loaded after pasting.
+- Add a debug marker (hot pink background, version alert) while iterating; remove it before the final commit.
+- Selector order of reliability: `href` patterns, then `aria-label`, then `data-testid`, then DOM structure. Class names are obfuscated and rotate — avoid them.
+- Profile pages use absolute `href` values; other pages use relative ones. `a[href*="/jobs"]` (no trailing slash) matches both.
+- Some CSS selectors that hide feed elements also match search results and profile pages — if that happens, scope the rule more tightly or move the logic to JS.
+- The JS allowlist-redirect is the main mechanism. CSS is just a fallback for what slips through.

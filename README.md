@@ -1,29 +1,28 @@
 # personal-app-tweaks
 
-User scripts for [Hermit](https://hermit.chimbori.com/) on Android. Goal: use these apps as tools, not feeds — strip the algorithmic content, ads, and engagement traps, keep only the useful parts.
+User scripts for [Hermit](https://hermit.chimbori.com/) on Android. The goal is to use these apps for what they're actually useful for — messaging, search, looking people up — without the feed, ads, and recommended content.
 
-Currently: LinkedIn (messaging + search only, no feed).
+Currently: LinkedIn.
 
 ## How it works
 
-One self-contained `.user.js` per site. CSS + JS inlined — no external fetching (Hermit doesn't support `@require`/`@updateURL`, and LinkedIn's CSP blocks cross-origin fetch from user-script context).
+One self-contained `.user.js` per site. CSS and JS are inlined; no external fetching (Hermit doesn't support `@require`/`@updateURL`, and LinkedIn's CSP blocks cross-origin fetch from user-script context).
 
-Each script has two layers of defense:
-1. **JS redirect** — makes disallowed pages unreachable (e.g. `/feed/` → `/messaging/`)
-2. **CSS rules** — secondary fallback to hide distracting elements
+Each script has two layers:
+1. **JS redirect** — disallowed pages are made unreachable (e.g. `/feed/` redirects to `/messaging/`)
+2. **CSS rules** — secondary fallback to hide distracting elements that slip through
 
 ## Setup
 
-1. Create a Hermit Lite App for the site. Set user agent to **Desktop** (mobile LinkedIn is crippled).
+1. Create a Hermit Lite App for the site. Set user agent to **Desktop** (LinkedIn's mobile site is intentionally limited).
 2. Lite App settings → User Scripts → New script.
-3. **Name must end in `.user.js`** (Hermit silently rejects others).
+3. The script name must end in `.user.js` — Hermit silently ignores scripts that don't.
 4. Paste the file contents. Save. Reload.
 
-## Update flow
+## Updating
 
-Edit `<site>.user.js` → copy raw → paste into Hermit script → save → reload. ~30 seconds.
+Edit `<site>.user.js` → copy the raw file → paste into the Hermit script → save → reload. About 30 seconds.
 
 ## Selector notes
 
-- Prefer `href`, `aria-label`, `data-testid` over class names — LinkedIn's classes are obfuscated and rotate frequently.
-- Profile pages use absolute `href` values (`https://www.linkedin.com/jobs`); other pages use relative (`/jobs/`). Selectors must match both — use path fragment without trailing slash.
+LinkedIn's class names are obfuscated and change frequently, so selectors use `href`, `aria-label`, and `data-testid` instead. One gotcha: profile pages use absolute `href` values (`https://www.linkedin.com/jobs`) while other pages use relative ones (`/jobs/`). Selectors need to match both — use the path fragment without a trailing slash (e.g. `a[href*="/jobs"]`).
