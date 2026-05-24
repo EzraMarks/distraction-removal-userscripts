@@ -1,0 +1,36 @@
+/* LinkedIn distraction-stripping rules.
+ * Class names on LinkedIn are obfuscated and rotate — prefer aria-label,
+ * data-test-*, role, and href patterns. The JS redirect is the real
+ * defense; these rules just hide stuff the redirect doesn't catch.
+ */
+
+/* Hide global nav / bottom tab bar so there's nothing to tap into. */
+nav[aria-label*="Primary" i],
+[data-test-global-nav],
+[class*="global-nav__primary"],
+footer[role="navigation"] {
+  display: none !important;
+}
+
+/* Hide "Start a post" / share composer entrypoints. */
+[aria-label*="start a post" i],
+[aria-label*="create a post" i],
+[data-control-name*="share"],
+a[href*="/posts/new"],
+button[aria-label*="post" i] {
+  display: none !important;
+}
+
+/* Nuke any feed module that sneaks through. */
+[data-test-id*="feed" i],
+[class*="feed-shared"],
+[class*="news-feed"] {
+  display: none !important;
+}
+
+/* Hide the "install our app" / app-download nags. */
+[class*="app-aware-link"][href*="play.google.com"],
+[class*="upsell"],
+[data-test-id*="app-upsell"] {
+  display: none !important;
+}
