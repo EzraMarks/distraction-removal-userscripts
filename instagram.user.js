@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     instagram
-// @version  6
+// @version  7
 // ==/UserScript==
 (function() {
 
@@ -72,12 +72,12 @@
       display: none !important;
     }
 
-    /* On /explore/search/, the bottom 50px fixed nav overlaps the
-       scrolling results list. IG normally adds this padding via its
-       app-shell layout, which doesn't run when the page is rendered
-       outside the expected flow. */
-    body[data-tweak-page="search"] main {
-      padding-bottom: 60px !important;
+    /* On /explore/search/, content scrolls *over* the bottom nav (the
+       nav already has a solid background, but its stacking order is
+       below the scrolling list). Force the fixed nav above all content
+       so anything underneath is hidden by its background. */
+    body[data-tweak-page="search"] div[data-tweak-bottomnav] {
+      z-index: 9999 !important;
     }
   `;
   const style = document.createElement('style');
@@ -109,9 +109,22 @@
     });
   }
 
+  // Mark the fixed bottom-nav wrapper so CSS can raise its z-index
+  // (content sometimes stacks above it and scrolls *through* it).
+  function tagBottomNav() {
+    const home = document.querySelector('a[href="/"] svg[aria-label="Home"]')?.closest('a');
+    let el = home;
+    while (el && el.parentElement) {
+      if (getComputedStyle(el).position === 'fixed') break;
+      el = el.parentElement;
+    }
+    if (el) el.setAttribute('data-tweak-bottomnav', '1');
+  }
+
   function tick() {
     document.querySelectorAll('article').forEach(filterArticle);
     hidePlusIcon();
+    tagBottomNav();
   }
   tick();
   new MutationObserver(tick).observe(document.documentElement, { childList: true, subtree: true });
