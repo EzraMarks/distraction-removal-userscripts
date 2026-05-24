@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        linkedin
-// @version     14
+// @version     15
 // @match       https://www.linkedin.com/*
 // @updateURL   https://cdn.jsdelivr.net/gh/EzraMarks/personal-app-tweaks@main/linkedin.user.js
 // @downloadURL https://cdn.jsdelivr.net/gh/EzraMarks/personal-app-tweaks@main/linkedin.user.js
@@ -8,16 +8,8 @@
 // ==/UserScript==
 (function() {
 
-  // TEMP: version indicator — remove once scaling is confirmed working
-  window.addEventListener('DOMContentLoaded', function() {
-    var badge = document.createElement('div');
-    badge.textContent = 'v11';
-    badge.style.cssText = 'position:fixed;top:0;left:0;z-index:2147483647;background:red;color:white;font:bold 18px sans-serif;padding:4px 8px;pointer-events:none';
-    document.body.appendChild(badge);
-  });
-
   const CSS = `
-    html { zoom: 1.5; }
+    html { zoom: 2.0; }
 
     /* Nav: hide everything except Search and Messaging.
        Use path fragment without trailing slash — profile pages use absolute URLs
