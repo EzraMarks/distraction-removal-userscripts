@@ -12,7 +12,7 @@ slot — **never edited again**). It derives the site name from the hostname
 files — no bootstrap change.
 
 ```
-bootstrap.js          ← paste into each Hermit Lite App's user-script slot
+bootstrap.user.js     ← paste into each Hermit Lite App's user-script slot (name MUST end in .user.js)
 linkedin.css          ← hide rules
 linkedin.js           ← allowlist-by-redirect (only messaging + search reachable)
 instagram.css         ← (not yet)
