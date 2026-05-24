@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     instagram
-// @version  7
+// @version  9
 // ==/UserScript==
 (function() {
 
@@ -125,6 +125,7 @@
     document.querySelectorAll('article').forEach(filterArticle);
     hidePlusIcon();
     tagBottomNav();
+    lockReel();
   }
   tick();
   new MutationObserver(tick).observe(document.documentElement, { childList: true, subtree: true });
@@ -137,7 +138,9 @@
   //                                 (toggled by the body data attribute)
   function enforce() {
     var p = location.pathname;
-    if (/^\/reels(\/|$)/.test(p)) {
+    // /reels/ (no id) → home. /reels/<id>/ stays so DM-shared reels open;
+    // the swipe-to-next is disabled below via "data-tweak-page=reel".
+    if (p === '/reels/' || p === '/reels') {
       location.replace('https://www.instagram.com/');
       return;
     }
@@ -149,8 +152,41 @@
       let tag = '';
       if (p === '/explore/') tag = 'explore';
       else if (/^\/explore\/search(\/|$)/.test(p)) tag = 'search';
+      else if (/^\/reels?\/[^/]+/.test(p)) tag = 'reel';
       document.body.setAttribute('data-tweak-page', tag);
     }
+  }
+
+  // Lock any "reels stack" so the user can't swipe to the next reel.
+  // Triggers on /reel/<id>/, /reels/<id>/, AND the chat-overlay reel viewer
+  // (which keeps the URL at /direct/t/<id>/ — URL-agnostic detector needed).
+  //
+  // Heuristic: a scrollable container with multiple children, scrollHeight
+  // much greater than clientHeight, and at least one <video> descendant.
+  // The home feed scrolls at document level (no internal scroller), so it's
+  // unaffected.
+  function lockReel() {
+    document.querySelectorAll('div, section').forEach(el => {
+      // Re-evaluate each tick: IG lazy-loads more reels as siblings, and
+      // they need to be hidden too.
+      const cs = getComputedStyle(el);
+      const overflowedY = cs.overflowY === 'scroll' || cs.overflowY === 'auto';
+      const alreadyLocked = el.dataset.tweakReelLocked === '1';
+      if (!alreadyLocked) {
+        if (!overflowedY) return;
+        if (el.children.length < 2) return;
+        if (el.scrollHeight < el.clientHeight * 2) return;
+        if (!el.querySelector('video')) return;
+        el.style.setProperty('overflow', 'hidden', 'important');
+        el.dataset.tweakReelLocked = '1';
+      }
+      // Hide every child after the first, including any just added.
+      Array.from(el.children).slice(1).forEach(c => {
+        if (c.style.display !== 'none') {
+          c.style.setProperty('display', 'none', 'important');
+        }
+      });
+    });
   }
   enforce();
   const _push = history.pushState;
