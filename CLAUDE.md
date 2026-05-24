@@ -1,35 +1,28 @@
 # For Claude
 
-## Iteration loop
+## Purpose
 
-The user runs the scripts inside Hermit on Android. We can't deploy directly —
-the workflow is:
+Strip algorithmic noise from social/professional apps — ads, suggested content, engagement nudges — while keeping the functional parts (messaging, search, profiles). Each script is opinionated: it decides what's useful and makes everything else unreachable or invisible.
+
+## Workflow
 
 1. Edit `<site>.user.js` here.
-2. User copies the file into Hermit's user-script slot, reloads.
-3. User reports what's still distracting / broken.
+2. User pastes the file into Hermit's user-script slot, reloads.
+3. User reports what's still broken or distracting.
 
-To minimize round-trips, **test selectors locally first** with the
-Chrome DevTools MCP before guessing. Drive real Chrome (logged in to the
-target site) and verify rules actually match before committing.
+**Before committing:** test selectors in Chrome DevTools MCP (logged into the target site as the user). Verify rules actually match — don't guess.
 
 ## Architecture
 
-- One self-contained `.user.js` per site. Filename must end in `.user.js`
-  (Hermit silently rejects scripts without that extension).
-- Hermit doesn't support `@require` / `@grant` / `@updateURL`, and most target
-  sites' CSP blocks cross-origin fetch from user-script context — so CSS+JS
-  must be inlined in the script, no remote loading.
-- Hermit Lite Apps are set to **desktop user agent** for LinkedIn (mobile web
-  is crippled). Test in desktop Chrome accordingly.
+- One self-contained `.user.js` per site. Must end in `.user.js` (Hermit rejects others silently).
+- CSS + JS must be inlined. Hermit has no `@require`/`@grant`/`@updateURL`, and LinkedIn's CSP blocks cross-origin fetch.
+- Hermit Lite Apps use **desktop user agent** for LinkedIn. Test in desktop Chrome.
 
 ## Conventions
 
-- Each script starts with a `VERSION` constant and a `alert(VERSION + ...)` at
-  the top while iterating. Bump VERSION every commit so the user can confirm
-  the latest code is loaded after a paste. Remove the alert + debug pink/banner
-  once the script is stable.
-- Selector strategy: prefer `aria-label`, `data-test-*`, `role`, `href`
-  patterns. Avoid class names (obfuscated, rotate often on LinkedIn/Meta).
-- The JS allowlist-redirect is load-bearing — it's what makes the feed
-  *unreachable*, not just hidden. CSS rules are the secondary defense.
+- Bump `@version` every commit — user confirms the right version loaded after paste.
+- Add debug pink background + version alert while iterating; remove before final commit.
+- Selector priority: `href` patterns > `aria-label` > `data-testid` > structure. Never class names.
+- Profile pages use absolute `href` values; other pages use relative. Use path fragment without trailing slash to match both (e.g. `a[href*="/jobs"]` not `a[href*="/jobs/"]`).
+- The JS allowlist-redirect is load-bearing — CSS is just a fallback.
+- When a CSS selector also matches pages it shouldn't (search, profiles), scope it or drop it and handle in JS instead.
