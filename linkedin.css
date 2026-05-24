@@ -1,3 +1,20 @@
+/* === DEBUG MARKER (temporary) ===
+ * If the bootstrap is loading this file, the page background will be
+ * hot pink and a banner will appear at the top. If you don't see either,
+ * the bootstrap isn't running. */
+html, body { background: hotpink !important; }
+html::before {
+  content: "TWEAKS LOADED ✓";
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 2147483647;
+  background: black;
+  color: lime;
+  font: bold 18px monospace;
+  padding: 12px;
+  text-align: center;
+}
+
 /* LinkedIn distraction-stripping rules.
  * Class names on LinkedIn are obfuscated and rotate — prefer aria-label,
  * data-test-*, role, and href patterns. The JS redirect is the real
