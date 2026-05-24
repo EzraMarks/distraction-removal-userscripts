@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     instagram
-// @version  3
+// @version  6
 // ==/UserScript==
 (function() {
 
