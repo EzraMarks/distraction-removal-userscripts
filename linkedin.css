@@ -1,7 +1,5 @@
-/* === DEBUG MARKER (temporary) ===
- * If the bootstrap is loading this file, the page background will be
- * hot pink and a banner will appear at the top. If you don't see either,
- * the bootstrap isn't running. */
+/* === DEBUG MARKER (temporary) — leave on until we confirm the pipeline works.
+ * Page should be hot pink with a banner at the top. */
 html, body { background: hotpink !important; }
 html::before {
   content: "TWEAKS LOADED ✓";
