@@ -65,11 +65,19 @@
       display: none !important;
     }
 
-    /* On /explore/, hide the discovery grid. <main> has two children:
-       a <nav> with the search bar (keep) and a <div> wrapping the grid
-       (hide). */
-    body[data-tweak-explore="1"] main > div {
+    /* On /explore/, hide the discovery grid. <main> has the search bar
+       in a <nav>; everything else (whether wrapped in a <div> or as
+       direct <a> tiles) is grid content. */
+    body[data-tweak-page="explore"] main > :not(nav) {
       display: none !important;
+    }
+
+    /* On /explore/search/, the bottom 50px fixed nav overlaps the
+       scrolling results list. IG normally adds this padding via its
+       app-shell layout, which doesn't run when the page is rendered
+       outside the expected flow. */
+    body[data-tweak-page="search"] main {
+      padding-bottom: 60px !important;
     }
   `;
   const style = document.createElement('style');
@@ -124,9 +132,12 @@
       location.replace('https://www.instagram.com/explore/');
       return;
     }
-    document.body?.toggleAttribute && document.body.setAttribute(
-      'data-tweak-explore', p === '/explore/' ? '1' : '0'
-    );
+    if (document.body) {
+      let tag = '';
+      if (p === '/explore/') tag = 'explore';
+      else if (/^\/explore\/search(\/|$)/.test(p)) tag = 'search';
+      document.body.setAttribute('data-tweak-page', tag);
+    }
   }
   enforce();
   const _push = history.pushState;
