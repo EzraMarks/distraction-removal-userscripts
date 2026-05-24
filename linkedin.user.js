@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        linkedin
-// @version     10
+// @version     11
 // @match       https://www.linkedin.com/*
 // @updateURL   https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/linkedin.user.js
 // @downloadURL https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/linkedin.user.js
@@ -8,14 +8,15 @@
 // ==/UserScript==
 (function() {
 
-  const CSS = `
-    /* TEMP: confirm script is loaded */
-    html::before {
-      content: "v10 loaded";
-      position: fixed; top: 0; left: 0; z-index: 99999;
-      background: red; color: white; font-size: 20px; padding: 4px 8px;
-    }
+  // TEMP: version indicator — remove once scaling is confirmed working
+  window.addEventListener('DOMContentLoaded', function() {
+    var badge = document.createElement('div');
+    badge.textContent = 'v11';
+    badge.style.cssText = 'position:fixed;top:0;left:0;z-index:2147483647;background:red;color:white;font:bold 18px sans-serif;padding:4px 8px;pointer-events:none';
+    document.body.appendChild(badge);
+  });
 
+  const CSS = `
     /* Scale desktop layout to fit mobile screen */
     html { zoom: 0.45; }
 
