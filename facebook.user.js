@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name     facebook
-// @version  8
+// @version  9
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {
 
   const CSS = `
-    /* Nav: hide home/watch/reels/gaming/dating/notifications/friends.
-       Keep groups + marketplace + messages.
+    /* Nav: hide home/watch/reels/gaming/dating/notifications/friends/memories/saved.
+       Keep groups + marketplace.
        Match by href fragment — class names are obfuscated and rotate. */
     a[href="/"],
     a[href^="/watch"],
@@ -75,28 +75,33 @@
     }
   `;
 
-  // Bookmarks menu (/bookmarks/) tile labels to hide. Each tile is a small
-  // card whose label matches one of these strings exactly. We hide each
-  // tile's enclosing card via a JS pass below — there's no stable class.
+  // Bookmarks menu (/bookmarks/) tile labels to remove from the DOM.
+  // FB lays out this grid with hardcoded per-item margins: even-index
+  // listitems get `margin-left: 12px` (left column), odd-index get
+  // `margin: -77px 0 0 210px` (right column, lifted up to align with the
+  // previous row). Removing items breaks that pattern — a surviving
+  // odd-index item still has -77px margin-top and floats above the list.
+  // So after removal we renumber and reapply the margins by new index.
   const BOOKMARK_HIDE = new Set([
     'Messages', 'Reels', 'Dating', 'Pages', 'Saved', 'Memories', 'Birthdays',
     'Games', 'Ads Manager', 'Feeds', 'Watch',
   ]);
   function hideBookmarkTiles() {
     if (!/^\/bookmarks(\/|$)/.test(location.pathname)) return;
+    const lists = new Set();
     document.querySelectorAll('a, [role="link"], [role="button"]').forEach(el => {
       const t = (el.innerText || '').trim().split('\n')[0];
       if (!BOOKMARK_HIDE.has(t)) return;
-      let host = el;
-      for (let i = 0; i < 4 && host.parentElement; i++) {
-        host = host.parentElement;
-        if (isTopLevel(host)) return;
-        const r = host.getBoundingClientRect();
-        if (r.height > 50 && r.height < 200 && r.width > 100) {
-          if (host.style.display !== 'none') host.style.setProperty('display', 'none', 'important');
-          return;
-        }
-      }
+      const li = el.closest('[role="listitem"]');
+      if (!li || isTopLevel(li)) return;
+      if (li.parentElement) lists.add(li.parentElement);
+      li.remove();
+    });
+    lists.forEach(list => {
+      Array.from(list.children).forEach((it, idx) => {
+        const m = idx % 2 === 0 ? '0 0 0 12px' : '-77px 0 0 210px';
+        if (it.style.margin !== m) it.style.setProperty('margin', m, 'important');
+      });
     });
   }
 
