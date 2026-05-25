@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     facebook
-// @version  7
+// @version  8
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {
@@ -68,13 +68,18 @@
     [role="button"][aria-label="Photo" i] {
       display: none !important;
     }
+
+    /* Back button on /bookmarks/ leads to / which redirects right back. */
+    body[data-fbt-page="bookmarks"] [role="button"][aria-label="Back" i] {
+      display: none !important;
+    }
   `;
 
   // Bookmarks menu (/bookmarks/) tile labels to hide. Each tile is a small
   // card whose label matches one of these strings exactly. We hide each
   // tile's enclosing card via a JS pass below — there's no stable class.
   const BOOKMARK_HIDE = new Set([
-    'Reels', 'Dating', 'Pages', 'Saved', 'Memories', 'Birthdays',
+    'Messages', 'Reels', 'Dating', 'Pages', 'Saved', 'Memories', 'Birthdays',
     'Games', 'Ads Manager', 'Feeds', 'Watch',
   ]);
   function hideBookmarkTiles() {
@@ -293,6 +298,15 @@
     }
     if (BLOCKED.some(r => r.test(p))) {
       location.replace(HOME);
+      return;
+    }
+    // Tag the body so page-scoped CSS (e.g., hiding the back button on
+    // /bookmarks/) can match without affecting other pages.
+    if (document.body) {
+      const tag = /^\/bookmarks(\/|$)/.test(p) ? 'bookmarks' : '';
+      if (document.body.getAttribute('data-fbt-page') !== tag) {
+        document.body.setAttribute('data-fbt-page', tag);
+      }
     }
   }
 
