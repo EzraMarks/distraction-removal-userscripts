@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     facebook
-// @version  6
+// @version  7
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {
@@ -15,7 +15,6 @@
     a[href^="/gaming"],
     a[href^="/dating"],
     a[href^="/notifications"],
-    a[href^="/friends"],
     a[href^="/memories"],
     a[href^="/saved"],
     a[aria-label="Home" i],
@@ -23,7 +22,6 @@
     a[aria-label="Reels" i],
     a[aria-label="Gaming" i],
     a[aria-label="Notifications" i],
-    a[aria-label="Friends" i],
     div[aria-label*="Stories" i],
     div[aria-label*="Reels" i] {
       display: none !important;
@@ -50,7 +48,6 @@
     /* === Mobile FB (no <a> nav; tabs are divs with semantic aria-labels). ===
        Hide feed/friends/reels/notifications. Keep messages + marketplace. */
     [role="tab"][aria-label^="feed" i],
-    [role="tab"][aria-label^="friends" i],
     [role="tab"][aria-label^="reels" i],
     [role="tab"][aria-label^="notifications" i] {
       display: none !important;
@@ -72,6 +69,31 @@
       display: none !important;
     }
   `;
+
+  // Bookmarks menu (/bookmarks/) tile labels to hide. Each tile is a small
+  // card whose label matches one of these strings exactly. We hide each
+  // tile's enclosing card via a JS pass below — there's no stable class.
+  const BOOKMARK_HIDE = new Set([
+    'Reels', 'Dating', 'Pages', 'Saved', 'Memories', 'Birthdays',
+    'Games', 'Ads Manager', 'Feeds', 'Watch',
+  ]);
+  function hideBookmarkTiles() {
+    if (!/^\/bookmarks(\/|$)/.test(location.pathname)) return;
+    document.querySelectorAll('a, [role="link"], [role="button"]').forEach(el => {
+      const t = (el.innerText || '').trim().split('\n')[0];
+      if (!BOOKMARK_HIDE.has(t)) return;
+      let host = el;
+      for (let i = 0; i < 4 && host.parentElement; i++) {
+        host = host.parentElement;
+        if (isTopLevel(host)) return;
+        const r = host.getBoundingClientRect();
+        if (r.height > 50 && r.height < 200 && r.width > 100) {
+          if (host.style.display !== 'none') host.style.setProperty('display', 'none', 'important');
+          return;
+        }
+      }
+    });
+  }
 
   const style = document.createElement('style');
   style.textContent = CSS;
@@ -223,6 +245,7 @@
     hideReelsRibbon();
     hideOpenAppBanner();
     hideFeedPosts();
+    hideBookmarkTiles();
   }
   hideAll();
   // Observe DOM additions only — NOT style/attribute changes. Otherwise
@@ -232,17 +255,17 @@
     .observe(document.documentElement, { childList: true, subtree: true });
 
   // Redirect away from disallowed pages. Allowed (not in this list):
+  //   /bookmarks/       — the FB menu page (our landing — clear tile UI)
   //   /messages/        — messenger
   //   /search/          — search
   //   /groups/          — groups (Buy Nothing, etc.)
   //   /marketplace/     — marketplace
+  //   /friends/         — friends list
   //   /events/          — events
   //   /<profile>        — profile pages
   //   /login, /checkpoint, /privacy, /help — auth/system
-  // NOTE: `/` is intentionally NOT blocked. The home page is where the
-  // global Search button and FB Menu live; we hide the feed content in
-  // place instead (composer/stories/reels/posts/PYMK selectors above).
   const BLOCKED = [
+    /^\/$/,
     /^\/home(\.php)?(\/|$)/,
     /^\/watch(\/|$)/,
     /^\/reel(\/|$)/,
@@ -250,13 +273,15 @@
     /^\/gaming(\/|$)/,
     /^\/dating(\/|$)/,
     /^\/notifications(\/|$)/,
-    /^\/friends(\/|$)/,
     /^\/memories(\/|$)/,
     /^\/saved(\/|$)/,
     /^\/stories(\/|$)/,
   ];
-  // Fallback target for blocked pages (watch/reels/notifications/etc.).
-  const HOME = 'https://www.facebook.com/';
+  // Landing page: the FB menu (/bookmarks/) — big tile buttons for
+  // Messages, Groups, Friends, Marketplace, Events plus a Search affordance.
+  // The home feed's nav rendered poorly under Hermit; this gives a stable,
+  // tappable surface instead.
+  const HOME = 'https://www.facebook.com/bookmarks/';
 
   function enforce() {
     const p = location.pathname;
