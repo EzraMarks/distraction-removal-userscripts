@@ -6,7 +6,10 @@ Currently: LinkedIn, Instagram, Facebook.
 
 ## Setup
 
-1. Create a Hermit Lite App for the site. Set user agent to **Desktop** (LinkedIn's mobile site is intentionally limited).
+1. Create a Hermit Lite App for the site. Set the user agent per site:
+   - **LinkedIn → Desktop** (mobile LinkedIn is intentionally limited).
+   - **Instagram → Mobile** (default).
+   - **Facebook → Mobile** (the desktop site uses a different DOM than what these selectors target).
 2. Lite App settings → User Scripts → New script.
 3. The script name must end in `.user.js` — Hermit silently ignores scripts that don't.
 4. Paste the file contents. Save. Reload.

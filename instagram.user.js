@@ -2,6 +2,7 @@
 // @name     instagram
 // @version  9
 // ==/UserScript==
+// Hermit user agent: Mobile.
 (function() {
 
   // ── 1. Data-layer filter ──────────────────────────────────────────────

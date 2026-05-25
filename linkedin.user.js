@@ -2,6 +2,7 @@
 // @name     linkedin
 // @version  17
 // ==/UserScript==
+// Hermit user agent: Desktop (mobile LinkedIn is intentionally limited).
 (function() {
 
   const CSS = `

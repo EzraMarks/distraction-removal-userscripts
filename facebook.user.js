@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name     facebook
-// @version  1
+// @version  3
 // ==/UserScript==
+// Hermit user agent: Mobile.
 (function() {
 
   const CSS = `
@@ -45,6 +46,31 @@
     a[href^="/search/videos"] {
       display: none !important;
     }
+
+    /* === Mobile FB (no <a> nav; tabs are divs with semantic aria-labels). ===
+       Hide feed/friends/reels/notifications. Keep messages + marketplace. */
+    [role="tab"][aria-label^="feed" i],
+    [role="tab"][aria-label^="friends" i],
+    [role="tab"][aria-label^="reels" i],
+    [role="tab"][aria-label^="notifications" i] {
+      display: none !important;
+    }
+
+    /* Mobile stories tray + create-story */
+    [role="button"][aria-label*="story" i] {
+      display: none !important;
+    }
+
+    /* Mobile reels embedded in the feed */
+    [role="button"][aria-label*="reel video" i] {
+      display: none !important;
+    }
+
+    /* Mobile post composer ("What's on your mind?") */
+    [role="button"][aria-label*="What's on your mind" i],
+    [role="button"][aria-label="Photo" i] {
+      display: none !important;
+    }
   `;
 
   const style = document.createElement('style');
@@ -77,8 +103,106 @@
       }
     });
   }
-  hideByText();
-  new MutationObserver(hideByText).observe(document.documentElement, { childList: true, subtree: true });
+
+  // Mobile "People You May Know" cards have no stable selector — each is a
+  // small container with an "Add friend" button. Hide the surrounding card.
+  function hidePYMK() {
+    document.querySelectorAll('[role="button"]').forEach(b => {
+      if (!/^Add friend/.test((b.innerText || '').trim())) return;
+      let host = b;
+      for (let i = 0; i < 8 && host.parentElement; i++) {
+        host = host.parentElement;
+        if (host.tagName === 'DIV' && host.offsetHeight > 100 && host.offsetHeight < 400) {
+          host.style.setProperty('display', 'none', 'important');
+          return;
+        }
+      }
+    });
+  }
+
+  // The story buttons are hidden via CSS, but the card containers around
+  // them (photo background, badge counts) remain. Walk up from any story
+  // button to the smallest ancestor that wraps multiple story buttons —
+  // that's the stories row.
+  function hideStoryRow() {
+    const stories = document.querySelectorAll('[role="button"][aria-label*="story" i]');
+    if (!stories.length) return;
+    let host = stories[0].parentElement;
+    for (let i = 0; i < 10 && host; i++) {
+      if (host.querySelectorAll('[role="button"][aria-label*="story" i]').length >= 2) {
+        if (host.style.display !== 'none') host.style.setProperty('display', 'none', 'important');
+        return;
+      }
+      host = host.parentElement;
+    }
+  }
+
+  // Hide the inline "Reels" ribbon header on the feed (a small clickable
+  // strip with just the text "Reels" and a kebab menu).
+  function hideReelsRibbon() {
+    document.querySelectorAll('span, h2, h3, div').forEach(el => {
+      if ((el.textContent || '').trim() !== 'Reels') return;
+      if (el.children.length > 0) return; // leaf nodes only
+      let host = el;
+      for (let i = 0; i < 6 && host.parentElement; i++) {
+        host = host.parentElement;
+        const r = host.getBoundingClientRect();
+        if (r.height > 30 && r.height < 200) {
+          if (host.style.display !== 'none') host.style.setProperty('display', 'none', 'important');
+          return;
+        }
+      }
+    });
+  }
+
+  // "Open app" banner at the bottom of mobile pages.
+  function hideOpenAppBanner() {
+    document.querySelectorAll('[role="button"], a').forEach(el => {
+      if ((el.textContent || '').trim() !== 'Open app') return;
+      let host = el;
+      for (let i = 0; i < 5 && host.parentElement; i++) {
+        host = host.parentElement;
+        const r = host.getBoundingClientRect();
+        if (r.height > 40 && r.height < 150) {
+          if (host.style.display !== 'none') host.style.setProperty('display', 'none', 'important');
+          return;
+        }
+      }
+    });
+  }
+
+  // Mobile feed posts: each post has a "More options for <author>" button.
+  // Walk up to the LARGEST ancestor that still wraps just this one post.
+  // FB re-renders and strips inline styles, so we re-apply on every
+  // MutationObserver tick (no memoization).
+  function hideFeedPosts() {
+    if (!/^\/$|^\/home/.test(location.pathname)) return; // only on home
+    document.querySelectorAll('[role="button"][aria-label^="More options for" i]').forEach(b => {
+      let host = b.parentElement;
+      let card = null;
+      for (let i = 0; i < 12 && host; i++) {
+        const moreCount = host.querySelectorAll('[role="button"][aria-label^="More options for" i]').length;
+        if (moreCount !== 1) break; // ancestor wraps multiple posts — stop
+        card = host;
+        host = host.parentElement;
+      }
+      if (card && card.style.display !== 'none') {
+        card.style.setProperty('display', 'none', 'important');
+      }
+    });
+  }
+
+  function hideAll() {
+    hideByText();
+    hidePYMK();
+    hideStoryRow();
+    hideReelsRibbon();
+    hideOpenAppBanner();
+    hideFeedPosts();
+  }
+  hideAll();
+  new MutationObserver(hideAll)
+    .observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
 
   // Redirect away from disallowed pages. Allowed (not in this list):
   //   /messages/        — messenger
@@ -88,8 +212,10 @@
   //   /events/          — events
   //   /<profile>        — profile pages
   //   /login, /checkpoint, /privacy, /help — auth/system
+  // NOTE: `/` is intentionally NOT blocked. The home page is where the
+  // global Search button and FB Menu live; we hide the feed content in
+  // place instead (composer/stories/reels/posts/PYMK selectors above).
   const BLOCKED = [
-    /^\/$/,
     /^\/home(\.php)?(\/|$)/,
     /^\/watch(\/|$)/,
     /^\/reel(\/|$)/,
@@ -102,8 +228,8 @@
     /^\/saved(\/|$)/,
     /^\/stories(\/|$)/,
   ];
-  // Land on groups feed — the user's primary use case.
-  const HOME = 'https://www.facebook.com/groups/feed/';
+  // Fallback target for blocked pages (watch/reels/notifications/etc.).
+  const HOME = 'https://www.facebook.com/';
 
   function enforce() {
     const p = location.pathname;
