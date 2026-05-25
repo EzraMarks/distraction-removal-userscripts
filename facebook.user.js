@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     facebook
-// @version  4
+// @version  6
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {
@@ -77,6 +77,21 @@
   style.textContent = CSS;
   (document.head || document.documentElement).appendChild(style);
 
+  // Never hide top-level wrappers — they hold the entire app. A node is
+  // "top-level" if it's within ~3 elements of <body> (so #screen-root, its
+  // immediate scaffolding, etc.), if it carries an id, or if it occupies
+  // most of the viewport width.
+  function isTopLevel(el) {
+    if (!el || el === document.body || el === document.documentElement) return true;
+    if (el.id) return true;
+    let p = el;
+    for (let depth = 0; depth < 4 && p; depth++) {
+      p = p.parentElement;
+      if (p === document.body) return true;
+    }
+    return false;
+  }
+
   // Text-match fallback for elements without stable selectors: Sponsored posts,
   // Suggested for you, People you may know.
   const TEXT_HIDE = [
@@ -95,6 +110,7 @@
       let host = el;
       for (let i = 0; i < 8 && host.parentElement; i++) {
         host = host.parentElement;
+        if (isTopLevel(host)) return;
         const h = host.offsetHeight;
         if (host.getAttribute('role') === 'article' ||
             host.getAttribute('data-pagelet') ||
@@ -114,6 +130,7 @@
       let host = b;
       for (let i = 0; i < 8 && host.parentElement; i++) {
         host = host.parentElement;
+        if (isTopLevel(host)) return;
         if (host.tagName === 'DIV' && host.offsetHeight > 100 && host.offsetHeight < 400) {
           host.style.setProperty('display', 'none', 'important');
           return;
@@ -131,7 +148,9 @@
     if (!stories.length) return;
     let host = stories[0].parentElement;
     for (let i = 0; i < 10 && host; i++) {
+      if (isTopLevel(host)) return;
       if (host.querySelectorAll('[role="button"][aria-label*="story" i]').length >= 2) {
+        if (host.offsetHeight > 1500) return;
         if (host.style.display !== 'none') host.style.setProperty('display', 'none', 'important');
         return;
       }
@@ -148,6 +167,7 @@
       let host = el;
       for (let i = 0; i < 6 && host.parentElement; i++) {
         host = host.parentElement;
+        if (isTopLevel(host)) return;
         const r = host.getBoundingClientRect();
         if (r.height > 30 && r.height < 200) {
           if (host.style.display !== 'none') host.style.setProperty('display', 'none', 'important');
@@ -164,6 +184,7 @@
       let host = el;
       for (let i = 0; i < 5 && host.parentElement; i++) {
         host = host.parentElement;
+        if (isTopLevel(host)) return;
         const r = host.getBoundingClientRect();
         if (r.height > 40 && r.height < 150) {
           if (host.style.display !== 'none') host.style.setProperty('display', 'none', 'important');
@@ -183,12 +204,13 @@
       let host = b.parentElement;
       let card = null;
       for (let i = 0; i < 12 && host; i++) {
+        if (isTopLevel(host)) break;
         const moreCount = host.querySelectorAll('[role="button"][aria-label^="More options for" i]').length;
         if (moreCount !== 1) break; // ancestor wraps multiple posts — stop
         card = host;
         host = host.parentElement;
       }
-      if (card && card.style.display !== 'none') {
+      if (card && card.offsetHeight < 2500 && card.style.display !== 'none') {
         card.style.setProperty('display', 'none', 'important');
       }
     });
