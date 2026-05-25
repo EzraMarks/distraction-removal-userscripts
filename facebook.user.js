@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     facebook
-// @version  3
+// @version  4
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {
@@ -90,13 +90,15 @@
       const t = (el.textContent || '').trim();
       if (!t || t.length > 40) return;
       if (!TEXT_HIDE.some(r => r.test(t))) return;
-      // Walk up to the nearest feed-card-ish container and hide it.
+      // Walk up to the nearest feed-card-ish container and hide it. Cap
+      // the upper bound so we never hide a page-level wrapper.
       let host = el;
       for (let i = 0; i < 8 && host.parentElement; i++) {
         host = host.parentElement;
+        const h = host.offsetHeight;
         if (host.getAttribute('role') === 'article' ||
             host.getAttribute('data-pagelet') ||
-            (host.tagName === 'DIV' && host.offsetHeight > 100)) {
+            (host.tagName === 'DIV' && h > 100 && h < 800)) {
           host.style.setProperty('display', 'none', 'important');
           return;
         }
@@ -201,8 +203,11 @@
     hideFeedPosts();
   }
   hideAll();
+  // Observe DOM additions only — NOT style/attribute changes. Otherwise
+  // our own display:none writes feed back into the observer and trigger
+  // re-runs in a loop that eventually hides the whole page.
   new MutationObserver(hideAll)
-    .observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+    .observe(document.documentElement, { childList: true, subtree: true });
 
   // Redirect away from disallowed pages. Allowed (not in this list):
   //   /messages/        — messenger
