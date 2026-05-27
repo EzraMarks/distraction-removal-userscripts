@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         facebook
 // @namespace    https://github.com/EzraMarks/personal-app-tweaks
-// @version      12
+// @version      13
 // @description  Hide ads, feeds, and recommended content on social apps.
 // @match        *://*.facebook.com/*
 // @run-at       document-start
@@ -256,28 +256,27 @@
   }
 
   // Lock the reel/watch viewer to a single video so the user can't swipe
-  // down to FB's recommended reels.
+  // down to FB's next recommended reel.
   //
-  // The IG version used "scrollable container with any descendant <video>",
-  // which on FB matched the entire app shell (player + sidebar as
-  // siblings) and blanked the page. Here we require at least TWO direct
-  // children that each contain a video — that's the distinctive reel-stack
-  // signature; a page shell has one video child and unrelated others.
+  // Real signature on mobile FB: an ancestor of <video> that has
+  // `scroll-snap-type: y mandatory`. FB renders ~16 placeholder children
+  // in this scroller and only fills one with a video at a time — so
+  // counting video children doesn't work; the snap-y type is what does.
   function lockReel() {
     if (!/^\/(watch|reels?)(\/|$)/.test(location.pathname)) return;
-    document.querySelectorAll('div, section').forEach(el => {
-      if (isTopLevel(el)) return;
-      const videoKids = Array.from(el.children).filter(c => c.querySelector('video'));
-      if (videoKids.length < 2) return;
-      if (!el.dataset.fbtReelLocked) {
-        el.style.setProperty('overflow', 'hidden', 'important');
-        el.dataset.fbtReelLocked = '1';
+    document.querySelectorAll('video').forEach(v => {
+      let host = v;
+      for (let i = 0; i < 12 && host.parentElement; i++) {
+        host = host.parentElement;
+        if (isTopLevel(host)) return;
+        const cs = getComputedStyle(host);
+        if (!/^y/.test(cs.scrollSnapType)) continue;
+        if (host.dataset.fbtReelLocked === '1') return;
+        host.style.setProperty('overflow', 'hidden', 'important');
+        host.style.setProperty('scroll-snap-type', 'none', 'important');
+        host.dataset.fbtReelLocked = '1';
+        return;
       }
-      videoKids.slice(1).forEach(c => {
-        if (c.style.display !== 'none') {
-          c.style.setProperty('display', 'none', 'important');
-        }
-      });
     });
   }
 

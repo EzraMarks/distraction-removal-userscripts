@@ -9,7 +9,7 @@
   "sites": [
     {
       "name": "facebook",
-      "version": 12,
+      "version": 13,
       "matches": ["*://*.facebook.com/*"],
       "hermit": { "userAgent": "Mobile" }
     },
