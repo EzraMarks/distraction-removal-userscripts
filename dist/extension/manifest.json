@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "personal-app-tweaks",
+  "version": "1.0.0",
+  "description": "Hide ads, feeds, and recommended content on social apps.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "personal-app-tweaks@ezramarks.com"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.facebook.com/*"
+      ],
+      "js": [
+        "sites/facebook.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "*://*.instagram.com/*"
+      ],
+      "js": [
+        "sites/instagram.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "*://*.linkedin.com/*"
+      ],
+      "js": [
+        "sites/linkedin.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "sites/youtube.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    }
+  ]
+}

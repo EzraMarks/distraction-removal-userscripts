@@ -1,0 +1,37 @@
+{
+  "extension": {
+    "name": "personal-app-tweaks",
+    "version": "1.0.0",
+    "description": "Hide ads, feeds, and recommended content on social apps.",
+    "geckoId": "personal-app-tweaks@ezramarks.com"
+  },
+  "sites": [
+    {
+      "name": "facebook",
+      "version": 9,
+      "matches": ["*://*.facebook.com/*"],
+      "hermit": { "userAgent": "Mobile" }
+    },
+    {
+      "name": "instagram",
+      "version": 9,
+      "matches": ["*://*.instagram.com/*"],
+      "hermit": { "userAgent": "Mobile" }
+    },
+    {
+      "name": "linkedin",
+      "version": 17,
+      "matches": ["*://*.linkedin.com/*"],
+      "hermit": {
+        "userAgent": "Desktop",
+        "note": "mobile LinkedIn is intentionally limited"
+      }
+    },
+    {
+      "name": "youtube",
+      "version": 10,
+      "matches": ["*://*.youtube.com/*"],
+      "hermit": { "userAgent": "Mobile" }
+    }
+  ]
+}
