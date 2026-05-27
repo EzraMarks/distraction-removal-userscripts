@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         facebook
 // @namespace    https://github.com/EzraMarks/personal-app-tweaks
-// @version      14
+// @version      15
 // @description  Hide ads, feeds, and recommended content on social apps.
 // @match        *://*.facebook.com/*
 // @run-at       document-start
@@ -79,6 +79,15 @@
     /* Back button on /bookmarks/ leads to / which redirects right back. */
     body[data-fbt-page="bookmarks"] [role="button"][aria-label="Back" i] {
       display: none !important;
+    }
+
+    /* On reel pages, disable snap behavior (a safety net). The actual
+       "hide everything but the visible reel" pass happens in JS below
+       (lockReel) because FB lazy-fills carousel slots with new videos
+       as you scroll, so a static CSS filter would gradually let them
+       leak through. */
+    body[data-fbt-page="reel"] .vscroller-snap {
+      scroll-snap-type: none !important;
     }
   `;
 
@@ -255,37 +264,23 @@
     });
   }
 
-  // Lock the reel/watch viewer to a single video so the user can't swipe
-  // down to FB's next recommended reel.
-  //
-  // Real signature on mobile FB: an ancestor of <video> that has
-  // `scroll-snap-type: y mandatory`. FB renders ~16 placeholder children
-  // in this scroller and only fills one with a video at a time — so
-  // counting video children doesn't work; the snap-y type is what does.
+  // On a /reel/<id> page, keep only the carousel child that contains
+  // the current video and hide its siblings. FB's reel scroller has
+  // ~16 placeholder children that lazy-fill with new reels as you
+  // scroll — so we re-evaluate on every observer tick (no memoization)
+  // and FB stripping our inline display:none just means we re-apply.
   function lockReel() {
-    if (!/^\/(watch|reels?)(\/|$)/.test(location.pathname)) return;
-    document.querySelectorAll('video').forEach(v => {
-      let host = v;
-      for (let i = 0; i < 12 && host.parentElement; i++) {
-        host = host.parentElement;
-        if (isTopLevel(host)) return;
-        const cs = getComputedStyle(host);
-        if (!/^y/.test(cs.scrollSnapType)) continue;
-        if (host.dataset.fbtReelLocked === '1') return;
-        host.style.setProperty('overflow', 'hidden', 'important');
-        host.style.setProperty('scroll-snap-type', 'none', 'important');
-        // On mobile, overflow:hidden alone doesn't stop touch panning —
-        // browsers honor the element's `touch-action`. Setting it to
-        // `none` blocks pan/swipe gestures while still allowing taps
-        // (those fire on pointer events, not touch-action).
-        host.style.setProperty('touch-action', 'none', 'important');
-        host.style.setProperty('overscroll-behavior', 'contain', 'important');
-        // Safety net: if anything still manages to scroll, snap back.
-        const onScroll = () => { host.scrollTop = 0; };
-        host.addEventListener('scroll', onScroll, { passive: true });
-        host.dataset.fbtReelLocked = '1';
-        return;
-      }
+    if (!/^\/reels?\/[^/]+/.test(location.pathname)) return;
+    document.querySelectorAll('.vscroller-snap').forEach(scroller => {
+      const kids = Array.from(scroller.children);
+      const keepIdx = kids.findIndex(k => k.querySelector('video'));
+      if (keepIdx < 0) return;
+      kids.forEach((k, i) => {
+        if (i === keepIdx) return;
+        if (k.style.display !== 'none') {
+          k.style.setProperty('display', 'none', 'important');
+        }
+      });
     });
   }
 
@@ -359,10 +354,13 @@
       location.replace(HOME);
       return;
     }
-    // Tag the body so page-scoped CSS (e.g., hiding the back button on
-    // /bookmarks/) can match without affecting other pages.
+    // Tag the body so page-scoped CSS can match without affecting other
+    // pages: 'bookmarks' (hide back button), 'reel' (lock the reel
+    // carousel to a single video).
     if (document.body) {
-      const tag = /^\/bookmarks(\/|$)/.test(p) ? 'bookmarks' : '';
+      let tag = '';
+      if (/^\/bookmarks(\/|$)/.test(p)) tag = 'bookmarks';
+      else if (/^\/reels?\/[^/]+/.test(p)) tag = 'reel';
       if (document.body.getAttribute('data-fbt-page') !== tag) {
         document.body.setAttribute('data-fbt-page', tag);
       }
