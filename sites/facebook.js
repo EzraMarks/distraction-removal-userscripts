@@ -243,6 +243,33 @@
     });
   }
 
+  // Lock the reel/watch viewer to a single video so the user can't swipe
+  // down to FB's recommended reels (same approach as the IG script).
+  // Heuristic: a scrollable container, multiple children, scrollHeight
+  // much greater than clientHeight, at least one <video>. The feed scrolls
+  // at the document level (no internal scroller) so it's unaffected.
+  function lockReel() {
+    if (!/^\/(watch|reels?)(\/|$)/.test(location.pathname)) return;
+    document.querySelectorAll('div, section').forEach(el => {
+      const alreadyLocked = el.dataset.fbtReelLocked === '1';
+      if (!alreadyLocked) {
+        const cs = getComputedStyle(el);
+        const overflowedY = cs.overflowY === 'scroll' || cs.overflowY === 'auto';
+        if (!overflowedY) return;
+        if (el.children.length < 2) return;
+        if (el.scrollHeight < el.clientHeight * 2) return;
+        if (!el.querySelector('video')) return;
+        el.style.setProperty('overflow', 'hidden', 'important');
+        el.dataset.fbtReelLocked = '1';
+      }
+      Array.from(el.children).slice(1).forEach(c => {
+        if (c.style.display !== 'none') {
+          c.style.setProperty('display', 'none', 'important');
+        }
+      });
+    });
+  }
+
   function hideAll() {
     hideByText();
     hidePYMK();
@@ -251,6 +278,7 @@
     hideOpenAppBanner();
     hideFeedPosts();
     hideBookmarkTiles();
+    lockReel();
   }
   hideAll();
   // Observe DOM additions only — NOT style/attribute changes. Otherwise
