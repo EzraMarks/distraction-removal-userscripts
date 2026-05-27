@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     youtube
-// @version  5
+// @version  6
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {
@@ -28,16 +28,16 @@
       display: none !important;
     }
 
-    /* Watch page related videos.
-       Desktop: #related sidebar.
-       Mobile: under ytm-single-column-watch-next-results-renderer, the
-       metadata section is the FIRST child; subsequent item-sections hold
-       the related-video carousel. Hide all but the first. Also kill
-       the "yt-video-metadata-carousel" chips (related-topic carousel). */
+    /* Watch page related videos. Container classes (e.g.
+       div.related-items-container) shift between YouTube layouts /
+       webviews, so we instead target the video card element directly —
+       it's stable and never used by the comments UI. */
     ytd-watch-next-secondary-results-renderer,
     #related,
     ytm-watch-next-related-renderer,
-    body[data-tweak-page="watch"] div.related-items-container {
+    body[data-tweak-page="watch"] ytm-video-with-context-renderer,
+    body[data-tweak-page="watch"] ytm-compact-video-renderer,
+    body[data-tweak-page="watch"] ytm-compact-autoplay-renderer {
       display: none !important;
     }
 
