@@ -18,3 +18,7 @@ Currently: LinkedIn, Instagram, Facebook, YouTube.
 ## Updating
 
 Edit `<site>.user.js` → copy the raw file → paste into the Hermit script → save → reload.
+
+## Hermit Lite App backups
+
+`hermit-backup/` holds Hermit's Lite App backup archives. Restore from that folder to recreate the Lite Apps.
