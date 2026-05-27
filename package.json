@@ -4,10 +4,6 @@
   "version": "1.0.0",
   "description": "Build the userscripts and bundled MV3 extension from sites/.",
   "scripts": {
-    "build": "node build.js",
-    "sign": "node build.js && bash -c 'set -a; [ -f .env ] && . ./.env; set +a; web-ext sign --source-dir=dist/extension --artifacts-dir=dist/xpi --channel=unlisted'"
-  },
-  "devDependencies": {
-    "web-ext": "^8.3.0"
+    "build": "node build.js"
   }
 }

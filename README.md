@@ -10,7 +10,7 @@ Currently: LinkedIn, Instagram, Facebook, YouTube.
 - `sites.config.json` — per-site metadata (version, match patterns, Hermit UA, GitHub raw-content base URL).
 - `build.js` — generates the deploy targets below. Run `node build.js`.
 - `dist/userscripts/<name>.user.js` — generated. For Tampermonkey or Hermit.
-- `dist/extension/` — generated. MV3 extension for Chrome/Firefox if you want a single bundle.
+- `dist/extension/` — generated MV3 extension bundle. Built for free but not the primary install path (see "Unpacked extension" below).
 
 ## Mobile setup (the actual goal)
 
@@ -44,10 +44,10 @@ Hermit Lite Apps wrap a single site in its own webview with a user-script slot �
 
 ## Unpacked extension (rare path)
 
-If you want to skip Tampermonkey and run a single bundled extension:
+If you'd rather run a single bundled extension than use Tampermonkey:
 
 - **Chrome:** chrome://extensions → enable Developer mode → "Load unpacked" → pick `dist/extension/`.
-- **Firefox (desktop):** about:debugging → This Firefox → "Load Temporary Add-on" → pick `dist/extension/manifest.json`. (For permanent install / Firefox Android, the XPI must be signed by Mozilla — and Mozilla forbids remote-code-loading extensions, so each change still needs a re-sign. Tampermonkey is the AMO-blessed exception for that workflow.)
+- **Firefox (desktop):** about:debugging → This Firefox → "Load Temporary Add-on" → pick `dist/extension/manifest.json`. Temporary only — for a permanent install or any Firefox Android use, the XPI must be signed by Mozilla, and Mozilla bans remote-code loading, so you'd have to re-sign on every change. That's why Tampermonkey is the recommended path.
 
 ## Updating
 
