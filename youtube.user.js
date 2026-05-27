@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     youtube
-// @version  9
+// @version  10
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {
@@ -61,7 +61,10 @@
     .ytp-upnext,
     .ytp-autonav-endscreen-upnext-container,
     .ytp-prev-button,
-    .ytp-next-button {
+    .ytp-next-button,
+    .player-middle-controls-prev-next-button,
+    button[aria-label="Previous video" i],
+    button[aria-label="Next video" i] {
       display: none !important;
     }
 
