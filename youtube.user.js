@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     youtube
-// @version  2
+// @version  3
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {
@@ -28,11 +28,24 @@
       display: none !important;
     }
 
-    /* Watch page: related/recommended sidebar. */
+    /* Watch page related videos.
+       Desktop: #related sidebar.
+       Mobile: under ytm-single-column-watch-next-results-renderer, the
+       metadata section is the FIRST child; subsequent item-sections hold
+       the related-video carousel. Hide all but the first. Also kill
+       the "yt-video-metadata-carousel" chips (related-topic carousel). */
     ytd-watch-next-secondary-results-renderer,
     #related,
     ytm-watch-next-related-renderer,
-    ytm-item-section-renderer.related-items {
+    body[data-tweak-page="watch"] ytm-item-section-renderer.scwnr-content,
+    body[data-tweak-page="watch"] div.related-items-container,
+    body[data-tweak-page="watch"] yt-video-metadata-carousel-view-model {
+      display: none !important;
+    }
+
+    /* Search-box autocomplete dropdown. */
+    .ytSearchboxComponentSuggestionsContainer,
+    yt-searchbox-suggestions-container {
       display: none !important;
     }
 
