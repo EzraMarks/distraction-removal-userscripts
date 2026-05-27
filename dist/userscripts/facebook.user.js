@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         facebook
 // @namespace    https://github.com/EzraMarks/personal-app-tweaks
-// @version      11
+// @version      12
 // @description  Hide ads, feeds, and recommended content on social apps.
 // @match        *://*.facebook.com/*
 // @run-at       document-start
@@ -256,25 +256,24 @@
   }
 
   // Lock the reel/watch viewer to a single video so the user can't swipe
-  // down to FB's recommended reels (same approach as the IG script).
-  // Heuristic: a scrollable container, multiple children, scrollHeight
-  // much greater than clientHeight, at least one <video>. The feed scrolls
-  // at the document level (no internal scroller) so it's unaffected.
+  // down to FB's recommended reels.
+  //
+  // The IG version used "scrollable container with any descendant <video>",
+  // which on FB matched the entire app shell (player + sidebar as
+  // siblings) and blanked the page. Here we require at least TWO direct
+  // children that each contain a video — that's the distinctive reel-stack
+  // signature; a page shell has one video child and unrelated others.
   function lockReel() {
     if (!/^\/(watch|reels?)(\/|$)/.test(location.pathname)) return;
     document.querySelectorAll('div, section').forEach(el => {
-      const alreadyLocked = el.dataset.fbtReelLocked === '1';
-      if (!alreadyLocked) {
-        const cs = getComputedStyle(el);
-        const overflowedY = cs.overflowY === 'scroll' || cs.overflowY === 'auto';
-        if (!overflowedY) return;
-        if (el.children.length < 2) return;
-        if (el.scrollHeight < el.clientHeight * 2) return;
-        if (!el.querySelector('video')) return;
+      if (isTopLevel(el)) return;
+      const videoKids = Array.from(el.children).filter(c => c.querySelector('video'));
+      if (videoKids.length < 2) return;
+      if (!el.dataset.fbtReelLocked) {
         el.style.setProperty('overflow', 'hidden', 'important');
         el.dataset.fbtReelLocked = '1';
       }
-      Array.from(el.children).slice(1).forEach(c => {
+      videoKids.slice(1).forEach(c => {
         if (c.style.display !== 'none') {
           c.style.setProperty('display', 'none', 'important');
         }
