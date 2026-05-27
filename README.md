@@ -9,7 +9,8 @@ Currently: LinkedIn, Instagram, Facebook, YouTube.
 - `sites/<name>.js` — neutral source for each site (an IIFE, no headers). **Edit these.**
 - `sites.config.json` — per-site metadata (version, match patterns, Hermit UA, GitHub raw-content base URL).
 - `build.js` — generates the deploy targets below. Run `node build.js`.
-- `dist/userscripts/<name>.user.js` — generated. For Tampermonkey or Hermit.
+- `dist/userscripts/all.user.js` — generated combined userscript (all sites in one). The primary install URL for Tampermonkey.
+- `dist/userscripts/<name>.user.js` — generated per-site userscripts. Lighter for Hermit (each Lite App is single-site anyway).
 - `dist/extension/` — generated MV3 extension bundle. Built for free but not the primary install path (see "Unpacked extension" below).
 
 ## Mobile setup (the actual goal)
@@ -18,22 +19,22 @@ Set **Firefox as the default browser** on Android and disable each app's "open l
 
 1. Install [Firefox for Android](https://play.google.com/store/apps/details?id=org.mozilla.firefox).
 2. Install [Tampermonkey](https://addons.mozilla.org/en-US/android/addon/tampermonkey/) (works in Firefox Android via the recommended add-ons collection).
-3. In Tampermonkey, install each userscript by URL — Tampermonkey auto-updates them whenever you push to `main`:
-   - `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/facebook.user.js`
-   - `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/instagram.user.js`
-   - `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/linkedin.user.js`
-   - `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/youtube.user.js`
+3. In Tampermonkey, install the combined userscript by URL. Tampermonkey auto-updates it whenever you push to `main`:
+
+   `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/all.user.js`
+
+   (Per-site URLs exist too — same path, replace `all` with `facebook`, `instagram`, `linkedin`, or `youtube` — if you'd rather install/manage them individually.)
 4. Android Settings → Apps → (each social app) → "Open by default" → off. Links now route through Firefox.
 
 LinkedIn caveat: mobile LinkedIn is intentionally stripped-down regardless of these scripts. In Firefox Android, request the desktop site (menu → "Request desktop site") for the full UI — the `linkedin` userscript assumes that layout.
 
 ## Desktop
 
-Install Tampermonkey in Chrome or Firefox and add the userscripts by URL (same list as above). They auto-update.
+Install Tampermonkey in Chrome or Firefox and add the combined userscript by URL (same URL as above). It auto-updates.
 
 ## Hermit (Android, alternative to Firefox)
 
-Hermit Lite Apps wrap a single site in its own webview with a user-script slot — useful if you'd rather have separate "app" icons. Paste the contents of `dist/userscripts/<name>.user.js` into Hermit's user-script slot. Set the user agent per site:
+Hermit Lite Apps wrap a single site in its own webview with a user-script slot — useful if you'd rather have separate "app" icons. Paste the contents of `dist/userscripts/<name>.user.js` (the per-site file, not the bundle) into each Lite App's user-script slot. Set the user agent per site:
 
 - **LinkedIn → Desktop** (mobile LinkedIn is intentionally limited).
 - **Instagram → Mobile**.

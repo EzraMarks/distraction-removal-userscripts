@@ -36,7 +36,8 @@ Emulate the right device for each site (`emulate` tool): mobile UA for Facebook/
 
 - `sites/<name>.js` is the neutral source: one self-contained IIFE per site, no userscript header, no `import`/`require`.
 - `sites.config.json` lists each site (name, version, match patterns, Hermit user agent) plus the GitHub raw-content base used for `@updateURL`. `build.js` reads this and emits:
-  - `dist/userscripts/<name>.user.js` — full userscript with `@match`/`@run-at`/`@updateURL`/`@downloadURL` headers. Works in Tampermonkey (auto-updates) and Hermit (paste manually — Hermit ignores everything except `@name`, and files must end in `.user.js`).
+  - `dist/userscripts/all.user.js` — combined userscript covering all sites. Each per-site IIFE is wrapped in an `if (host matches) { ... }` gate so only one branch runs per page. Version = max of per-site versions. Primary Tampermonkey install URL.
+  - `dist/userscripts/<name>.user.js` — per-site userscripts with the same metadata. Used in Hermit (each Lite App is single-site) or by anyone who prefers per-site install/version control. Hermit ignores everything except `@name`; files must end in `.user.js`.
   - `dist/extension/` — a single MV3 extension (Chrome + Firefox) with one `content_scripts` entry per site, `run_at: document_start`, `world: MAIN`. The `MAIN` world is required so the Instagram `JSON.parse` / `Response.json` hooks affect the page's actual parses (the default isolated world would no-op).
 - CSS and JS must be inlined into each site file. Hermit has no `@require`/`@grant`/`@updateURL`, and LinkedIn's CSP blocks cross-origin fetch.
 - The JS allowlist-redirect is the main mechanism. CSS is a fallback.
