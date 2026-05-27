@@ -262,6 +262,15 @@
         if (host.dataset.fbtReelLocked === '1') return;
         host.style.setProperty('overflow', 'hidden', 'important');
         host.style.setProperty('scroll-snap-type', 'none', 'important');
+        // On mobile, overflow:hidden alone doesn't stop touch panning —
+        // browsers honor the element's `touch-action`. Setting it to
+        // `none` blocks pan/swipe gestures while still allowing taps
+        // (those fire on pointer events, not touch-action).
+        host.style.setProperty('touch-action', 'none', 'important');
+        host.style.setProperty('overscroll-behavior', 'contain', 'important');
+        // Safety net: if anything still manages to scroll, snap back.
+        const onScroll = () => { host.scrollTop = 0; };
+        host.addEventListener('scroll', onScroll, { passive: true });
         host.dataset.fbtReelLocked = '1';
         return;
       }
