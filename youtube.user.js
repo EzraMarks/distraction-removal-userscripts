@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     youtube
-// @version  8
+// @version  9
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {
@@ -54,11 +54,14 @@
       display: none !important;
     }
 
-    /* End-screen overlays, autoplay "up next" cards. */
+    /* End-screen overlays, autoplay "up next" cards, prev/next-video
+       buttons in the player chrome (they queue suggested videos). */
     .ytp-ce-element,
     .ytp-endscreen-element,
     .ytp-upnext,
-    .ytp-autonav-endscreen-upnext-container {
+    .ytp-autonav-endscreen-upnext-container,
+    .ytp-prev-button,
+    .ytp-next-button {
       display: none !important;
     }
 
