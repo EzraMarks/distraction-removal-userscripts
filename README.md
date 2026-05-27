@@ -31,8 +31,20 @@ The intent on Android: set **Firefox as the default browser**, install this exte
 To install as an unpacked extension:
 
 - **Chrome:** chrome://extensions → enable Developer mode → "Load unpacked" → pick `dist/extension/`.
-- **Firefox (desktop):** about:debugging → This Firefox → "Load Temporary Add-on" → pick `dist/extension/manifest.json`. (Permanent install requires AMO signing.)
-- **Firefox (Android):** install via a Custom Collection on AMO, or sideload a signed `.xpi`.
+- **Firefox (desktop):** about:debugging → This Firefox → "Load Temporary Add-on" → pick `dist/extension/manifest.json`. Temporary only; for permanent install use a signed `.xpi` (below).
+- **Firefox (Android):** install a signed `.xpi` — Firefox for Android refuses unsigned extensions.
+
+### Signing an `.xpi`
+
+1. Create an account on [addons.mozilla.org](https://addons.mozilla.org/) and generate API credentials at <https://addons.mozilla.org/developers/addon/api/key/>. You'll get a JWT issuer + secret.
+2. `npm install` (one-time).
+3. Bump `extension.version` in `sites.config.json` — AMO refuses duplicate versions.
+4. Run:
+   ```sh
+   WEB_EXT_API_KEY=<jwt-issuer> WEB_EXT_API_SECRET=<jwt-secret> npm run sign
+   ```
+   This builds, submits to AMO's self-distribution channel (unlisted), and drops the signed `.xpi` in `dist/xpi/`.
+5. Host the `.xpi` somewhere reachable (e.g. GitHub release, or `python3 -m http.server` on the same network) and open the URL in Firefox Android to install.
 
 ## Updating
 

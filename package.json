@@ -1,0 +1,13 @@
+{
+  "name": "personal-app-tweaks",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Build + sign the personal-app-tweaks browser extension.",
+  "scripts": {
+    "build": "node build.js",
+    "sign": "node build.js && web-ext sign --source-dir=dist/extension --artifacts-dir=dist/xpi --channel=unlisted"
+  },
+  "devDependencies": {
+    "web-ext": "^8.3.0"
+  }
+}
