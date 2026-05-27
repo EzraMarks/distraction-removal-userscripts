@@ -1,6 +1,13 @@
 // ==UserScript==
-// @name     linkedin
-// @version  17
+// @name         linkedin
+// @namespace    https://github.com/EzraMarks/personal-app-tweaks
+// @version      17
+// @description  Hide ads, feeds, and recommended content on social apps.
+// @match        *://*.linkedin.com/*
+// @run-at       document-start
+// @grant        none
+// @downloadURL  https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/linkedin.user.js
+// @updateURL    https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/linkedin.user.js
 // ==/UserScript==
 // Hermit user agent: Desktop (mobile LinkedIn is intentionally limited).
 (function() {

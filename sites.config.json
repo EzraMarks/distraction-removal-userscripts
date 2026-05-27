@@ -1,7 +1,8 @@
 {
+  "userscriptBaseUrl": "https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts",
   "extension": {
     "name": "personal-app-tweaks",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Hide ads, feeds, and recommended content on social apps.",
     "geckoId": "personal-app-tweaks@ezramarks.com"
   },

@@ -1,6 +1,13 @@
 // ==UserScript==
-// @name     facebook
-// @version  9
+// @name         facebook
+// @namespace    https://github.com/EzraMarks/personal-app-tweaks
+// @version      9
+// @description  Hide ads, feeds, and recommended content on social apps.
+// @match        *://*.facebook.com/*
+// @run-at       document-start
+// @grant        none
+// @downloadURL  https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/facebook.user.js
+// @updateURL    https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/facebook.user.js
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {

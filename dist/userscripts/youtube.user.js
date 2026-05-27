@@ -1,6 +1,13 @@
 // ==UserScript==
-// @name     youtube
-// @version  10
+// @name         youtube
+// @namespace    https://github.com/EzraMarks/personal-app-tweaks
+// @version      10
+// @description  Hide ads, feeds, and recommended content on social apps.
+// @match        *://*.youtube.com/*
+// @run-at       document-start
+// @grant        none
+// @downloadURL  https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/youtube.user.js
+// @updateURL    https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/youtube.user.js
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {

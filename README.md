@@ -7,45 +7,46 @@ Currently: LinkedIn, Instagram, Facebook, YouTube.
 ## Layout
 
 - `sites/<name>.js` — neutral source for each site (an IIFE, no headers). **Edit these.**
-- `sites.config.json` — per-site metadata (version, match patterns, Hermit UA).
-- `build.js` — generates the two deploy targets below. Run `node build.js`.
-- `dist/hermit/<name>.user.js` — generated. Paste into Hermit.
-- `dist/extension/` — generated. Load as an unpacked extension in Chrome or Firefox.
+- `sites.config.json` — per-site metadata (version, match patterns, Hermit UA, GitHub raw-content base URL).
+- `build.js` — generates the deploy targets below. Run `node build.js`.
+- `dist/userscripts/<name>.user.js` — generated. For Tampermonkey or Hermit.
+- `dist/extension/` — generated. MV3 extension for Chrome/Firefox if you want a single bundle.
 
-## Hermit (Android)
+## Mobile setup (the actual goal)
 
-1. Create a Hermit Lite App for the site. Set the user agent per site:
-   - **LinkedIn → Desktop** (mobile LinkedIn is intentionally limited).
-   - **Instagram → Mobile** (default).
-   - **Facebook → Mobile** (the desktop site uses a different DOM than what these selectors target).
-   - **YouTube → Mobile** (default).
-2. Lite App settings → User Scripts → New script.
-3. Paste the contents of `dist/hermit/<name>.user.js`. Save. Reload.
+Set **Firefox as the default browser** on Android and disable each app's "open links in app" setting. Now any link a friend messages you opens in Firefox with these tweaks applied, instead of bouncing into the destination app's feed.
 
-`hermit-backup/` holds Hermit's Lite App backup archives (the .hermit zips). Restore from that folder to recreate the Lite Apps themselves.
+1. Install [Firefox for Android](https://play.google.com/store/apps/details?id=org.mozilla.firefox).
+2. Install [Tampermonkey](https://addons.mozilla.org/en-US/android/addon/tampermonkey/) (works in Firefox Android via the recommended add-ons collection).
+3. In Tampermonkey, install each userscript by URL — Tampermonkey auto-updates them whenever you push to `main`:
+   - `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/facebook.user.js`
+   - `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/instagram.user.js`
+   - `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/linkedin.user.js`
+   - `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/youtube.user.js`
+4. Android Settings → Apps → (each social app) → "Open by default" → off. Links now route through Firefox.
 
-## Firefox / Chrome (desktop or Android Firefox)
+## Desktop
 
-The intent on Android: set **Firefox as the default browser**, install this extension, and disable per-app deep links — so messenger-shared links open in Firefox with these tweaks already applied, instead of bouncing into the destination app's UI.
+Install Tampermonkey in Chrome or Firefox and add the userscripts by URL (same list as above). They auto-update.
 
-To install as an unpacked extension:
+## Hermit (Android, alternative to Firefox)
+
+Hermit Lite Apps wrap a single site in its own webview with a user-script slot — useful if you'd rather have separate "app" icons. Paste the contents of `dist/userscripts/<name>.user.js` into Hermit's user-script slot. Set the user agent per site:
+
+- **LinkedIn → Desktop** (mobile LinkedIn is intentionally limited).
+- **Instagram → Mobile**.
+- **Facebook → Mobile** (the desktop site uses a different DOM than what these selectors target).
+- **YouTube → Mobile**.
+
+`hermit-backup/` holds Hermit's Lite App backup archives. Restore from that folder to recreate the Lite Apps themselves.
+
+## Unpacked extension (rare path)
+
+If you want to skip Tampermonkey and run a single bundled extension:
 
 - **Chrome:** chrome://extensions → enable Developer mode → "Load unpacked" → pick `dist/extension/`.
-- **Firefox (desktop):** about:debugging → This Firefox → "Load Temporary Add-on" → pick `dist/extension/manifest.json`. Temporary only; for permanent install use a signed `.xpi` (below).
-- **Firefox (Android):** install a signed `.xpi` — Firefox for Android refuses unsigned extensions.
-
-### Signing an `.xpi`
-
-1. Create an account on [addons.mozilla.org](https://addons.mozilla.org/) and generate API credentials at <https://addons.mozilla.org/developers/addon/api/key/>. You'll get a JWT issuer + secret.
-2. `npm install` (one-time).
-3. Bump `extension.version` in `sites.config.json` — AMO refuses duplicate versions.
-4. Run:
-   ```sh
-   WEB_EXT_API_KEY=<jwt-issuer> WEB_EXT_API_SECRET=<jwt-secret> npm run sign
-   ```
-   This builds, submits to AMO's self-distribution channel (unlisted), and drops the signed `.xpi` in `dist/xpi/`.
-5. Host the `.xpi` somewhere reachable (e.g. GitHub release, or `python3 -m http.server` on the same network) and open the URL in Firefox Android to install.
+- **Firefox (desktop):** about:debugging → This Firefox → "Load Temporary Add-on" → pick `dist/extension/manifest.json`. (For permanent install / Firefox Android, the XPI must be signed by Mozilla — and Mozilla forbids remote-code-loading extensions, so each change still needs a re-sign. Tampermonkey is the AMO-blessed exception for that workflow.)
 
 ## Updating
 
-Edit `sites/<name>.js` → `node build.js` → commit → re-paste into Hermit (or the extension auto-reloads).
+Edit `sites/<name>.js` → `node build.js` → `git push`. Tampermonkey pulls the new version automatically on its next check.
