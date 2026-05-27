@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     youtube
-// @version  6
+// @version  7
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {
@@ -37,7 +37,8 @@
     ytm-watch-next-related-renderer,
     body[data-tweak-page="watch"] ytm-video-with-context-renderer,
     body[data-tweak-page="watch"] ytm-compact-video-renderer,
-    body[data-tweak-page="watch"] ytm-compact-autoplay-renderer {
+    body[data-tweak-page="watch"] ytm-compact-autoplay-renderer,
+    body[data-tweak-page="watch"] ytm-continuation-item-renderer {
       display: none !important;
     }
 
