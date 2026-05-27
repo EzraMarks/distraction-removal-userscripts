@@ -5,7 +5,7 @@
   "description": "Build + sign the personal-app-tweaks browser extension.",
   "scripts": {
     "build": "node build.js",
-    "sign": "node build.js && web-ext sign --source-dir=dist/extension --artifacts-dir=dist/xpi --channel=unlisted"
+    "sign": "node build.js && bash -c 'set -a; [ -f .env ] && . ./.env; set +a; web-ext sign --source-dir=dist/extension --artifacts-dir=dist/xpi --channel=unlisted'"
   },
   "devDependencies": {
     "web-ext": "^8.3.0"
