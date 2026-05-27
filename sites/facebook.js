@@ -288,6 +288,18 @@
   // tappable surface instead.
   const HOME = 'https://www.facebook.com/bookmarks/';
 
+  // FB resolves shared content server-side to URLs that look like the
+  // feed pages we're trying to block:
+  //   /share/v/<id>/ → /watch?v=<id>   (single video)
+  //   /share/r/<id>/ → /reel/<id>/     (individual reel)
+  // Treat the resolved URL as allowed when it clearly points at one item
+  // rather than the surrounding feed/tab.
+  function isAllowedSharedView(p) {
+    if (p === '/watch' && /[?&]v=/.test(location.search)) return true;
+    if (/^\/reels?\/[^/]+/.test(p)) return true;
+    return false;
+  }
+
   function enforce() {
     const p = location.pathname;
     // Search "All" tab mixes posts/sponsored with people/pages. Send to People.
@@ -296,7 +308,7 @@
       location.replace(location.href.replace(/\/search\/(top|videos)/, '/search/people'));
       return;
     }
-    if (BLOCKED.some(r => r.test(p))) {
+    if (BLOCKED.some(r => r.test(p)) && !isAllowedSharedView(p)) {
       location.replace(HOME);
       return;
     }

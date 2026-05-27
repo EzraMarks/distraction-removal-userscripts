@@ -9,13 +9,13 @@
   "sites": [
     {
       "name": "facebook",
-      "version": 9,
+      "version": 10,
       "matches": ["*://*.facebook.com/*"],
       "hermit": { "userAgent": "Mobile" }
     },
     {
       "name": "instagram",
-      "version": 9,
+      "version": 10,
       "matches": ["*://*.instagram.com/*"],
       "hermit": { "userAgent": "Mobile" }
     },

@@ -117,8 +117,19 @@
     if (el) el.setAttribute('data-tweak-bottomnav', '1');
   }
 
+  // The article filter is meant for the feed (where "Follow" indicates a
+  // Suggested post). On a single-post URL — /p/<id>/, /reel/<id>/,
+  // /reels/<id>/, /tv/<id>/, /<user>/p/<id>/ — the lone article IS the
+  // post we want to read; "Follow" just means we don't follow the author.
+  // Filtering there would blank the page. Skip filter on those routes.
+  function isSinglePostPage() {
+    return /^\/(?:[^/]+\/)?(?:p|reel|reels|tv)\/[^/]+/.test(location.pathname);
+  }
+
   function tick() {
-    document.querySelectorAll('article').forEach(filterArticle);
+    if (!isSinglePostPage()) {
+      document.querySelectorAll('article').forEach(filterArticle);
+    }
     hidePlusIcon();
     tagBottomNav();
     lockReel();
