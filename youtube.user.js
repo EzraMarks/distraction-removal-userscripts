@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     youtube
-// @version  7
+// @version  8
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {
@@ -37,8 +37,14 @@
     ytm-watch-next-related-renderer,
     body[data-tweak-page="watch"] ytm-video-with-context-renderer,
     body[data-tweak-page="watch"] ytm-compact-video-renderer,
-    body[data-tweak-page="watch"] ytm-compact-autoplay-renderer,
-    body[data-tweak-page="watch"] ytm-continuation-item-renderer {
+    body[data-tweak-page="watch"] ytm-compact-autoplay-renderer {
+      display: none !important;
+    }
+    /* Hide the load-more spinner ONLY inside sections that contained
+       related-video cards — not the comments thread's spinner, which
+       uses the same element. */
+    body[data-tweak-page="watch"] ytm-item-section-renderer:has(ytm-video-with-context-renderer) ytm-continuation-item-renderer,
+    body[data-tweak-page="watch"] lazy-list:has(ytm-video-with-context-renderer) ytm-continuation-item-renderer {
       display: none !important;
     }
 
