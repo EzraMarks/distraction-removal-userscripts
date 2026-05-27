@@ -1,24 +1,25 @@
 // ==UserScript==
 // @name     youtube
-// @version  1
+// @version  2
 // ==/UserScript==
 // Hermit user agent: Mobile.
 (function() {
 
-  // ── CSS: hide ads, recommendations, shorts shelves, end screens. ──────
-  // Tagging the <body> with data-tweak-page lets us scope page-specific
-  // rules (notably: only show our search landing on the home page).
+  // The goal is "search bar only" — but we don't render our own search;
+  // we hide everything else and let YouTube's native top-bar search do the
+  // work. Note: YouTube enforces Trusted Types, so any injected HTML must
+  // be built with DOM APIs (no innerHTML).
   const CSS = `
-    /* Home feed grid — both mobile (ytm-) and desktop (ytd-). The masthead
-       lives outside these, so it stays visible. */
+    /* Home feed grid — both mobile (ytm-) and desktop (ytd-). */
     body[data-tweak-page="home"] ytm-rich-grid-renderer,
     body[data-tweak-page="home"] ytm-section-list-renderer,
+    body[data-tweak-page="home"] ytm-single-column-browse-results-renderer,
     body[data-tweak-page="home"] ytd-rich-grid-renderer,
     body[data-tweak-page="home"] ytd-two-column-browse-results-renderer {
       display: none !important;
     }
 
-    /* Shorts shelves embedded in feeds and search results. */
+    /* Shorts shelves wherever they appear. */
     ytd-reel-shelf-renderer,
     ytm-reel-shelf-renderer,
     ytd-rich-shelf-renderer[is-shorts],
@@ -43,8 +44,7 @@
       display: none !important;
     }
 
-    /* Ads in every form they take: in-feed slots, promoted videos, the
-       player ad module/overlay, masthead banner, mealbar promo dialogs. */
+    /* Ads everywhere. */
     ytd-ad-slot-renderer,
     ytd-promoted-sparkles-web-renderer,
     ytd-display-ad-renderer,
@@ -64,7 +64,7 @@
       display: none !important;
     }
 
-    /* Desktop side-nav + mini-guide entries we never want to reach. */
+    /* Desktop side-nav entries we never want to reach. */
     ytd-guide-entry-renderer:has(a[title="Shorts" i]),
     ytd-guide-entry-renderer:has(a[title="Trending" i]),
     ytd-guide-entry-renderer:has(a[title="Subscriptions" i]),
@@ -75,60 +75,20 @@
       display: none !important;
     }
 
-    /* Mobile bottom nav (pivot bar): keep Search, hide everything else. */
-    ytm-pivot-bar-item-renderer:has(a[href="/"]),
-    ytm-pivot-bar-item-renderer:has(a[href^="/shorts"]),
-    ytm-pivot-bar-item-renderer:has(a[href^="/feed/subscriptions"]),
-    ytm-pivot-bar-item-renderer:has(a[href^="/feed/library"]),
-    ytm-pivot-bar-item-renderer:has(a[href^="/feed/you"]) {
+    /* Mobile bottom pivot bar — hide all of it. Search is in the top bar. */
+    ytm-pivot-bar-renderer {
       display: none !important;
     }
-
-    /* Our injected landing — a full-screen overlay with just a search box.
-       Shown only on the home page; the rule below toggles display. */
-    #tweak-landing {
-      display: none;
-      position: fixed; inset: 0; z-index: 99999;
-      background: #0f0f0f; color: #fff;
-      align-items: center; justify-content: center;
-      font-family: Roboto, Arial, sans-serif;
-    }
-    body[data-tweak-page="home"] #tweak-landing {
-      display: flex !important;
-    }
-    #tweak-landing form {
-      width: min(90vw, 480px);
-      display: flex; gap: 8px;
-    }
-    #tweak-landing input {
-      flex: 1; padding: 14px 16px; font-size: 16px;
-      border: 1px solid #303030; border-radius: 24px;
-      background: #121212; color: #fff; outline: none;
-    }
-    #tweak-landing input:focus { border-color: #1c62b9; }
-    #tweak-landing button {
-      padding: 0 18px; border-radius: 24px;
-      border: 1px solid #303030; background: #222; color: #fff;
-      font-size: 16px; cursor: pointer;
-    }
   `;
-  const style = document.createElement('style');
-  style.textContent = CSS;
-  (document.head || document.documentElement).appendChild(style);
 
-  // Build the search-only landing overlay. Native <form> submit navigates
-  // to /results?search_query=X — no need to hook into YouTube's SPA router.
-  function ensureLanding() {
-    if (!document.body || document.getElementById('tweak-landing')) return;
-    const wrap = document.createElement('div');
-    wrap.id = 'tweak-landing';
-    wrap.innerHTML =
-      '<form action="/results" method="get">' +
-        '<input name="search_query" type="search" autocomplete="off" ' +
-               'autofocus placeholder="Search YouTube" />' +
-        '<button type="submit">Search</button>' +
-      '</form>';
-    document.body.appendChild(wrap);
+  function injectStyle() {
+    if (document.getElementById('tweak-style')) return;
+    const root = document.head || document.documentElement;
+    if (!root) return;
+    const style = document.createElement('style');
+    style.id = 'tweak-style';
+    style.textContent = CSS;
+    root.appendChild(style);
   }
 
   // Auto-skip video ads: click any visible skip button, and as a fallback
@@ -147,8 +107,9 @@
     }
   }
 
-  // Routes to redirect away from. Everything navigates back to '/', which
-  // is then visually replaced by our search landing.
+  // Routes that redirect home. We can't actually land on a "blank" page,
+  // so we accept the home URL and let the home-page rules above hide the
+  // feed grid — leaving just the top bar (logo + search + sign in).
   const BLOCKED = [
     /^\/shorts(\/|$)/,
     /^\/gaming(\/|$)/,
@@ -170,18 +131,27 @@
     if (document.body.getAttribute('data-tweak-page') !== tag) {
       document.body.setAttribute('data-tweak-page', tag);
     }
-    if (tag === 'home') ensureLanding();
   }
 
   function tick() {
+    injectStyle();
     enforce();
     skipAds();
   }
-  tick();
-  // Observe DOM additions only (no attribute/style watching) so our own
-  // writes can't feed back into the observer.
-  new MutationObserver(tick)
-    .observe(document.documentElement, { childList: true, subtree: true });
+
+  // initScript may fire before documentElement exists — defer the observer.
+  function start() {
+    tick();
+    new MutationObserver(tick)
+      .observe(document.documentElement, { childList: true, subtree: true });
+  }
+  if (document.documentElement) start();
+  else document.addEventListener('readystatechange', function once() {
+    if (document.documentElement) {
+      document.removeEventListener('readystatechange', once);
+      start();
+    }
+  });
 
   // YouTube is a single-page app — hook history so route changes re-run.
   const _push = history.pushState;
