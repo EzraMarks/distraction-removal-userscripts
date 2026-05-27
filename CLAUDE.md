@@ -7,8 +7,8 @@ Scripts that make social/professional apps less invasive — ads, suggested cont
 ## Workflow
 
 1. Edit `sites/<name>.js` — the neutral per-site source (an IIFE, no header).
-2. Run `node build.js` to regenerate `dist/hermit/<name>.user.js` and `dist/extension/`.
-3. The user pastes `dist/hermit/<name>.user.js` into Hermit, or loads `dist/extension/` as an unpacked browser extension.
+2. Run `node build.js` to regenerate `dist/userscripts/<name>.user.js` and `dist/extension/`.
+3. The user installs each `dist/userscripts/<name>.user.js` in Tampermonkey by URL (auto-updates from GitHub on push), pastes it into Hermit's user-script slot, or loads `dist/extension/` as an unpacked browser extension. Tampermonkey is the primary path.
 4. The user reports what's still broken or distracting.
 
 Test selectors in Chrome DevTools MCP (logged into the target site) before committing.
@@ -29,13 +29,14 @@ Emulate the right device for each site (`emulate` tool): mobile UA for Facebook/
 
 - **Whole page disappears.** A walk-up heuristic in the script (`hideX()` functions that climb the parent chain) hit the HTML or BODY element and hid it. Always guard walk-ups with `if (host === document.body || host === document.documentElement) break` and a height cap.
 - **MutationObserver feedback loop.** If the observer watches `attributes` (especially `style`), each `display:none` write triggers another full pass, which writes more styles, and so on until the page is empty. Observe `{ childList: true, subtree: true }` only.
-- **FB strips inline styles on re-render.** Don't memoize "already hidden" via `dataset` — let the observer re-apply on every DOM addition.
+- **FB strips inline styles on re-render.** Don't memoize "already hidden" via `dataset` — let the observer re-apply on every DOM addition. For state that must persist (e.g., locking a scroll container), prefer a CSS rule scoped by `body[data-fbt-page="..."]` over inline style.
+- **`touch-action` matters on mobile.** `overflow: hidden` alone doesn't stop a touch-pan inside a scroll-snap container; you also need `touch-action: none` (or hide the siblings so `scrollHeight === clientHeight`).
 
 ## Architecture
 
 - `sites/<name>.js` is the neutral source: one self-contained IIFE per site, no userscript header, no `import`/`require`.
-- `sites.config.json` lists each site (name, version, match patterns, Hermit user agent). `build.js` reads this and emits:
-  - `dist/hermit/<name>.user.js` — IIFE plus a Tampermonkey-style header. Hermit silently ignores files that don't end in `.user.js`.
+- `sites.config.json` lists each site (name, version, match patterns, Hermit user agent) plus the GitHub raw-content base used for `@updateURL`. `build.js` reads this and emits:
+  - `dist/userscripts/<name>.user.js` — full userscript with `@match`/`@run-at`/`@updateURL`/`@downloadURL` headers. Works in Tampermonkey (auto-updates) and Hermit (paste manually — Hermit ignores everything except `@name`, and files must end in `.user.js`).
   - `dist/extension/` — a single MV3 extension (Chrome + Firefox) with one `content_scripts` entry per site, `run_at: document_start`, `world: MAIN`. The `MAIN` world is required so the Instagram `JSON.parse` / `Response.json` hooks affect the page's actual parses (the default isolated world would no-op).
 - CSS and JS must be inlined into each site file. Hermit has no `@require`/`@grant`/`@updateURL`, and LinkedIn's CSP blocks cross-origin fetch.
 - The JS allowlist-redirect is the main mechanism. CSS is a fallback.

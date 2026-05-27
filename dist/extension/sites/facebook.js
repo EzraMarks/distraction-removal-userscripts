@@ -313,9 +313,8 @@
     /^\/stories(\/|$)/,
   ];
   // Landing page: the FB menu (/bookmarks/) — big tile buttons for
-  // Messages, Groups, Friends, Marketplace, Events plus a Search affordance.
-  // The home feed's nav rendered poorly under Hermit; this gives a stable,
-  // tappable surface instead.
+  // Messages, Groups, Friends, Marketplace, Events plus a Search
+  // affordance. Cleaner mobile entry point than the feed-with-nav-bar.
   const HOME = 'https://www.facebook.com/bookmarks/';
 
   // FB resolves shared content server-side to URLs that look like the

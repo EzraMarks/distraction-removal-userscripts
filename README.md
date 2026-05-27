@@ -25,6 +25,8 @@ Set **Firefox as the default browser** on Android and disable each app's "open l
    - `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/youtube.user.js`
 4. Android Settings → Apps → (each social app) → "Open by default" → off. Links now route through Firefox.
 
+LinkedIn caveat: mobile LinkedIn is intentionally stripped-down regardless of these scripts. In Firefox Android, request the desktop site (menu → "Request desktop site") for the full UI — the `linkedin` userscript assumes that layout.
+
 ## Desktop
 
 Install Tampermonkey in Chrome or Firefox and add the userscripts by URL (same list as above). They auto-update.
