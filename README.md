@@ -4,6 +4,8 @@ Scripts that make social apps less invasive by removing ads, suggested content, 
 
 Currently: LinkedIn, Instagram, Facebook, YouTube.
 
+> Note: this code is slap-dash AI-written for my personal use and is of dubious quality.
+
 **Scope: mobile.** These scripts are designed for *mobile* usage (Android — Firefox with Tampermonkey, or Hermit Lite Apps). They'll load in desktop browsers and not actively break anything, but the hide/redirect decisions are tuned for a small-screen, on-the-go workflow and may feel wrong on desktop. A separate desktop-targeted set isn't here yet; when it exists it'll live alongside the mobile one (likely under `sites/desktop/` with its own bundle).
 
 ## Layout
