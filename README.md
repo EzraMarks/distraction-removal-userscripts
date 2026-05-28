@@ -4,6 +4,8 @@ Scripts that make social/professional apps less invasive — ads, suggested cont
 
 Currently: LinkedIn, Instagram, Facebook, YouTube.
 
+**Scope: mobile.** These scripts are designed for *mobile* usage (Android — Firefox with Tampermonkey, or Hermit Lite Apps). They'll load in desktop browsers and not actively break anything, but the hide/redirect decisions are tuned for a small-screen, on-the-go workflow and may feel wrong on desktop. A separate desktop-targeted set isn't here yet; when it exists it'll live alongside the mobile one (likely under `sites/desktop/` with its own bundle).
+
 ## Layout
 
 - `sites/<name>.js` — neutral source for each site (an IIFE, no headers). **Edit these.**
@@ -30,7 +32,7 @@ LinkedIn caveat: mobile LinkedIn is intentionally stripped-down regardless of th
 
 ## Desktop
 
-Install Tampermonkey in Chrome or Firefox and add the combined userscript by URL (same URL as above). It auto-updates.
+Installable but not recommended — the tweaks are tuned for mobile and some choices (e.g. Facebook's `/bookmarks/` landing, YouTube's hide-everything-but-search) feel cramped on a desktop screen. If you want to try anyway, install the same combined userscript URL in desktop Tampermonkey; it auto-updates.
 
 ## Hermit (Android, alternative to Firefox)
 

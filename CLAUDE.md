@@ -4,6 +4,8 @@
 
 Scripts that make social/professional apps less invasive — ads, suggested content, and engagement nudges are hidden or made unreachable, while the actually useful parts (messaging, search, profiles) still work.
 
+**Scope: mobile only.** Every script in `sites/` is tuned for mobile usage (Android: Firefox + Tampermonkey, or Hermit Lite Apps). Desktop installs will technically run but the hide/redirect choices are made for a small-screen, on-the-go workflow. If a desktop variant is ever added, it'll live separately (likely `sites/desktop/<name>.js` with its own bundle output), not by trying to make one file serve both contexts. Don't bend the existing scripts to compromise on desktop ergonomics.
+
 ## Workflow
 
 1. Edit `sites/<name>.js` — the neutral per-site source (an IIFE, no header).
