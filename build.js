@@ -39,7 +39,7 @@ function userscriptHeader({ name, version, matches, url, footer }) {
   const lines = [
     '// ==UserScript==',
     `// ${pad('@name')} ${name}`,
-    `// ${pad('@namespace')} https://github.com/EzraMarks/personal-app-tweaks`,
+    `// ${pad('@namespace')} https://github.com/EzraMarks/distraction-removal-userscripts`,
     `// ${pad('@version')} ${version}`,
     `// ${pad('@description')} ${cfg.extension.description}`,
     ...matches.map(m => `// ${pad('@match')} ${m}`),
@@ -106,7 +106,7 @@ for (const site of cfg.sites) {
 // so Tampermonkey re-pulls on the next check.
 const bundleVersion = Math.max(...cfg.sites.map(s => s.version));
 const bundleHeader = userscriptHeader({
-  name: 'personal-app-tweaks',
+  name: 'distraction-removal-userscripts',
   version: bundleVersion,
   matches: allMatches,
   url: `${cfg.userscriptBaseUrl}/all.user.js`,

@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "personal-app-tweaks",
+  "name": "distraction-removal-userscripts",
   "version": "1.0.1",
   "description": "Hide ads, feeds, and recommended content on social apps.",
   "browser_specific_settings": {
     "gecko": {
-      "id": "personal-app-tweaks@ezramarks.com"
+      "id": "distraction-removal-userscripts@ezramarks.com"
     }
   },
   "content_scripts": [

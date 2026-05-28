@@ -1,10 +1,10 @@
 {
-  "userscriptBaseUrl": "https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts",
+  "userscriptBaseUrl": "https://raw.githubusercontent.com/EzraMarks/distraction-removal-userscripts/main/dist/userscripts",
   "extension": {
-    "name": "personal-app-tweaks",
+    "name": "distraction-removal-userscripts",
     "version": "1.0.1",
     "description": "Hide ads, feeds, and recommended content on social apps.",
-    "geckoId": "personal-app-tweaks@ezramarks.com"
+    "geckoId": "distraction-removal-userscripts@ezramarks.com"
   },
   "sites": [
     {

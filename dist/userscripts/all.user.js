@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name         personal-app-tweaks
-// @namespace    https://github.com/EzraMarks/personal-app-tweaks
+// @name         distraction-removal-userscripts
+// @namespace    https://github.com/EzraMarks/distraction-removal-userscripts
 // @version      17
 // @description  Hide ads, feeds, and recommended content on social apps.
 // @match        *://*.facebook.com/*
@@ -9,8 +9,8 @@
 // @match        *://*.youtube.com/*
 // @run-at       document-start
 // @grant        none
-// @downloadURL  https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/all.user.js
-// @updateURL    https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/all.user.js
+// @downloadURL  https://raw.githubusercontent.com/EzraMarks/distraction-removal-userscripts/main/dist/userscripts/all.user.js
+// @updateURL    https://raw.githubusercontent.com/EzraMarks/distraction-removal-userscripts/main/dist/userscripts/all.user.js
 // ==/UserScript==
 // ── facebook ──
 if (/(?:^|\.)facebook\.com$/.test(location.hostname)) {

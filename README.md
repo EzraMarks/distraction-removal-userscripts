@@ -1,4 +1,4 @@
-# personal-app-tweaks
+# distraction-removal-userscripts
 
 Scripts that make social/professional apps less invasive — ads, suggested content, and engagement nudges are hidden or made unreachable, while the actually useful parts (messaging, search, profiles) still work.
 
@@ -21,7 +21,7 @@ Set **Firefox as the default browser** on Android and disable each app's "open l
 2. Install [Tampermonkey](https://addons.mozilla.org/en-US/android/addon/tampermonkey/) (works in Firefox Android via the recommended add-ons collection).
 3. In Tampermonkey, install the combined userscript by URL. Tampermonkey auto-updates it whenever you push to `main`:
 
-   `https://raw.githubusercontent.com/EzraMarks/personal-app-tweaks/main/dist/userscripts/all.user.js`
+   `https://raw.githubusercontent.com/EzraMarks/distraction-removal-userscripts/main/dist/userscripts/all.user.js`
 
    (Per-site URLs exist too — same path, replace `all` with `facebook`, `instagram`, `linkedin`, or `youtube` — if you'd rather install/manage them individually.)
 4. Android Settings → Apps → (each social app) → "Open by default" → off. Links now route through Firefox.
