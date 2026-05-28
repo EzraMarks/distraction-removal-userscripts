@@ -1,6 +1,6 @@
 # distraction-removal-userscripts
 
-Scripts that make social/professional apps less invasive — ads, suggested content, and engagement nudges are hidden or made unreachable, while the actually useful parts (messaging, search, profiles) still work.
+Scripts that make social apps less invasive by removing ads, suggested content, and scrolling feeds, while keeping useful parts, e.g. search and messaging.
 
 Currently: LinkedIn, Instagram, Facebook, YouTube.
 
